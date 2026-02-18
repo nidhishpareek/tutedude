@@ -1,0 +1,2 @@
+Hello, this is my first file write program.
+Python file handling is simple and useful.
