@@ -1,5 +1,7 @@
 ## Flask + MongoDB Atlas App
 
+#### \*See Screenshots of the app in the ss folder
+
 ### Run
 
 ```bash
