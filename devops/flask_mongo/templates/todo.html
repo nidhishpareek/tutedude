@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do Form</title>
+</head>
+<body>
+  <h1>Create To-Do Item</h1>
+
+  <form id="todo-form">
+    <label for="item_name">Item Name:</label>
+    <input id="item_name" name="itemName" type="text" required>
+    <br><br>
+
+    <label for="item_description">Item Description:</label>
+    <textarea id="item_description" name="itemDescription" rows="4" cols="40" required></textarea>
+    <br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+  <p id="todo-message"></p>
+
+  <script>
+    const form = document.getElementById("todo-form");
+    const message = document.getElementById("todo-message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "";
+
+      const itemName = document.getElementById("item_name").value.trim();
+      const itemDescription = document.getElementById("item_description").value.trim();
+
+      try {
+        const response = await fetch("/submittodoitem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemName, itemDescription })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to submit todo item");
+        }
+
+        message.style.color = "green";
+        message.textContent = data.message || "Todo item submitted successfully";
+        form.reset();
+      } catch (error) {
+        message.style.color = "red";
+        message.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>
