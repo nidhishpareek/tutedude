@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do Submission</title>
+</head>
+<body>
+  <h1>Create To-Do Item</h1>
+
+  <% if (error) { %>
+    <p style="color: red;"><%= error %></p>
+  <% } %>
+
+  <% if (success) { %>
+    <p style="color: green;"><%= success %></p>
+  <% } %>
+
+  <form method="post" action="/submit">
+    <label for="item_id">Item ID:</label>
+    <input id="item_id" name="itemId" type="text">
+    <br><br>
+
+    <label for="item_uuid">Item UUID:</label>
+    <input id="item_uuid" name="itemUUID" type="text">
+    <br><br>
+
+    <label for="item_hash">Item Hash:</label>
+    <input id="item_hash" name="itemHash" type="text">
+    <br><br>
+
+    <label for="item_name">Item Name:</label>
+    <input id="item_name" name="itemName" type="text" required>
+    <br><br>
+
+    <label for="item_description">Item Description:</label>
+    <textarea id="item_description" name="itemDescription" rows="4" cols="40" required></textarea>
+    <br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
