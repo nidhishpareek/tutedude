@@ -9,6 +9,10 @@
   <h1>Create To-Do Item</h1>
 
   <form id="todo-form">
+    <label for="item_id">Item ID:</label>
+    <input id="item_id" name="itemId" type="text" required>
+    <br><br>
+
     <label for="item_name">Item Name:</label>
     <input id="item_name" name="itemName" type="text" required>
     <br><br>
@@ -29,6 +33,7 @@
       event.preventDefault();
       message.textContent = "";
 
+      const itemId = document.getElementById("item_id").value.trim();
       const itemName = document.getElementById("item_name").value.trim();
       const itemDescription = document.getElementById("item_description").value.trim();
 
@@ -36,7 +41,7 @@
         const response = await fetch("/submittodoitem", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemName, itemDescription })
+          body: JSON.stringify({ itemId, itemName, itemDescription })
         });
 
         const data = await response.json();
