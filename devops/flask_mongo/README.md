@@ -22,3 +22,5 @@ python app.py
 - `POST /` -> inserts into MongoDB Atlas, redirects to `/success` on success
 - `GET /success` -> "Data submitted successfully"
 - `GET /submissions` -> displays all submitted names and emails from MongoDB
+
+- `GET /todo` -> To-Do form with Item Name and Item Description (submit is no-op for now)

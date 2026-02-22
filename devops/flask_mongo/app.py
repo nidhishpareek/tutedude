@@ -69,6 +69,12 @@ def submissions():
     return render_template("submissions.html", records=records, error=error)
 
 
+@app.route("/todo", methods=["GET", "POST"])
+def todo():
+    # Submission is intentionally a no-op for now.
+    return render_template("todo.html")
+
+
 @app.route("/submittodoitem", methods=["POST"])
 def submit_todo_item():
     item_name = (request.form.get("itemName") or "").strip()
