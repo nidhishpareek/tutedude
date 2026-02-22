@@ -69,5 +69,28 @@ def submissions():
     return render_template("submissions.html", records=records, error=error)
 
 
+@app.route("/submittodoitem", methods=["POST"])
+def submit_todo_item():
+    item_name = (request.form.get("itemName") or "").strip()
+    item_description = (request.form.get("itemDescription") or "").strip()
+
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        item_name = (payload.get("itemName") or item_name).strip()
+        item_description = (payload.get("itemDescription") or item_description).strip()
+
+    if not item_name or not item_description:
+        return jsonify({"error": "itemName and itemDescription are required"}), 400
+
+    try:
+        collection = get_collection()
+        collection.insert_one(
+            {"itemName": item_name, "itemDescription": item_description}
+        )
+        return jsonify({"message": "Todo item submitted successfully"}), 201
+    except (ValueError, PyMongoError) as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)
