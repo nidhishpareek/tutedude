@@ -54,5 +54,20 @@ def success():
     return render_template("success.html")
 
 
+@app.route("/submissions", methods=["GET"])
+def submissions():
+    error = None
+    records = []
+
+    try:
+        collection = get_collection()
+        cursor = collection.find({}, {"_id": 0, "name": 1, "email": 1})
+        records = list(cursor)
+    except (ValueError, PyMongoError) as e:
+        error = str(e)
+
+    return render_template("submissions.html", records=records, error=error)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
