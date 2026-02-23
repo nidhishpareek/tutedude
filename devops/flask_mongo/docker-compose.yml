@@ -1,0 +1,12 @@
+services:
+  flask_app:
+    build: .
+    container_name: flask_mongo_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: ${MONGO_URI:-mongodb://host.docker.internal:27017}
+      MONGO_DB_NAME: test
+      MONGO_COLLECTION: submissions
+      PORT: 5000
