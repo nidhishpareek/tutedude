@@ -13,6 +13,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get("/", (_req, res) => {
+  res.render("form", { error: null, success: null });
+});
+
+// Load balancer / bootstrap health check. Must not depend on the backend.
+app.get("/health", (_req, res) => {
   res.send("server is healthy!");
 });
 
