@@ -1,11 +1,7 @@
-# Runs both apps locally with SQLite: frontend http://localhost:8080, backend http://localhost:5000
-#
-# No container_name on purpose: fixed names collide with containers left over
-# from other compose projects (e.g. the old flask_mongo one). Compose names them
-# devops-flask_app-1 etc., and the apps still reach each other by service name.
 services:
   flask_app:
     build: ./flask_mongo
+    container_name: todo-backend
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-5000}:5000"
@@ -17,9 +13,9 @@ services:
 
   express_frontend:
     build: ./express_frontend
+    container_name: todo-frontend
     restart: unless-stopped
     ports:
-      # Host port 8080, not 3000: 3000 is the default for most JS dev servers (Next.js, React).
       - "${FRONTEND_PORT:-8080}:3000"
     environment:
       PORT: 3000
