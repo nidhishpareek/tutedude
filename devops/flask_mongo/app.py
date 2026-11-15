@@ -5,6 +5,8 @@ import os
 import sqlite3
 
 app = Flask(__name__)
+app.json.ensure_ascii = False
+app.json.sort_keys = False
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "backend", "data.json")
@@ -134,28 +136,69 @@ def todo():
     return render_template("todo.html")
 
 
-@app.route("/submittodoitem", methods=["POST"])
-def submit_todo_item():
-    item_name = (request.form.get("itemName") or "").strip()
-    item_description = (request.form.get("itemDescription") or "").strip()
-
-    if request.is_json:
-        payload = request.get_json(silent=True) or {}
-        item_name = (payload.get("itemName") or item_name).strip()
-        item_description = (payload.get("itemDescription") or item_description).strip()
+def save_todo(item_name, item_description):
+    item_name = (item_name or "").strip()
+    item_description = (item_description or "").strip()
 
     if not item_name or not item_description:
         return jsonify({"error": "itemName and itemDescription are required"}), 400
 
     try:
         with get_db() as conn:
-            conn.execute(
+            cursor = conn.execute(
                 "INSERT INTO todo_items (item_name, item_description) VALUES (?, ?)",
                 (item_name, item_description),
             )
-        return jsonify({"message": "Todo item submitted successfully"}), 201
+        return jsonify({
+            "message": "Todo item submitted successfully",
+            "item": {
+                "id": cursor.lastrowid,
+                "itemName": item_name,
+                "itemDescription": item_description,
+            },
+        }), 201
     except sqlite3.Error as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/submittodoitem", methods=["POST"])
+def submit_todo_item():
+    item_name = request.form.get("itemName")
+    item_description = request.form.get("itemDescription")
+
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        item_name = payload.get("itemName") or item_name
+        item_description = payload.get("itemDescription") or item_description
+
+    return save_todo(item_name, item_description)
+
+
+@app.route("/addtodo", methods=["GET"])
+def add_todo_via_get():
+    return save_todo(request.args.get("itemName"), request.args.get("itemDescription"))
+
+
+@app.route("/todos", methods=["GET"])
+def list_todos():
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT id, item_name, item_description, created_at"
+                " FROM todo_items ORDER BY id DESC"
+            ).fetchall()
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify([
+        {
+            "id": row["id"],
+            "itemName": row["item_name"],
+            "itemDescription": row["item_description"],
+            "createdAt": row["created_at"],
+        }
+        for row in rows
+    ])
 
 
 if __name__ == "__main__":

@@ -26,3 +26,5 @@ python app.py
 - `GET /todo` -> To-Do form with Item Name and Item Description
 - `POST /submittodoitem` -> inserts into the `todo_items` table (called by the Express frontend)
 - `GET /todoitems` -> lists stored to-do items, newest first
+- `GET /addtodo?itemName=...&itemDescription=...` -> adds a to-do item from the browser, returns it as JSON
+- `GET /todos` -> all to-do items as JSON, newest first
