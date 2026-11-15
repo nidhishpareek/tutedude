@@ -1,95 +1,160 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
-  Todo app - Task 3b. Flask backend and Express frontend as Fargate (ARM64)
-  services behind one ALB. Frontend finds backend via Cloud Map private DNS
-  (backend.todo.internal), so no IPs are hard-coded anywhere. Backend stores
-  SQLite on EFS so data survives task replacement.
+  Todo app on AWS - Flask backend and Express frontend as Docker containers on
+  ECS Fargate, images in ECR, inside a dedicated VPC, behind one load balancer.
+  Deploy once with DesiredCount=0, push both images to ECR, then deploy again
+  with DesiredCount=1.
 
 Parameters:
-  BaseStackName:
+  ImageTag:
     Type: String
-    Default: todo-base
-  BackendImage:
-    Type: String
-    Description: Full ECR image URI with tag, e.g. <account>.dkr.ecr.ap-southeast-2.amazonaws.com/todo-ecr/backend:v1
-  FrontendImage:
-    Type: String
-    Description: Full ECR image URI with tag, e.g. <account>.dkr.ecr.ap-southeast-2.amazonaws.com/todo-ecr/frontend:v1
+    Default: v1
+    Description: Tag of the images pushed to both ECR repositories
   DesiredCount:
     Type: Number
-    Default: 1
-    # Max 1: SQLite allows one writer. Two backend tasks on the same file would contend for locks.
+    Default: 0
     AllowedValues: [0, 1]
-    Description: Tasks per service. 0 stops compute billing (the ALB and EFS still bill).
+    Description: Containers per service. 0 until the images are pushed.
   AdminCidr:
     Type: String
     Default: 0.0.0.0/0
-    Description: Who may reach Flask directly on ALB :5000. The frontend does not use this path.
+    Description: Who may open the backend directly on port 5000 (e.g. your IP as x.x.x.x/32)
 
 Resources:
-  # ---------- Security groups: internet -> ALB -> tasks, frontend -> backend ----------
+  # ---------- VPC ----------
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - { Key: Name, Value: !Sub "${AWS::StackName}-vpc" }
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref Vpc
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: 10.20.0.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - { Key: Name, Value: !Sub "${AWS::StackName}-public-1" }
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: 10.20.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - { Key: Name, Value: !Sub "${AWS::StackName}-public-2" }
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  # ---------- ECR ----------
+  BackendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${AWS::StackName}-backend"
+      EmptyOnDelete: true
+
+  FrontendRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${AWS::StackName}-frontend"
+      EmptyOnDelete: true
+
+  # ---------- Security groups: internet -> load balancer -> containers ----------
   AlbSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Todo ALB
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      GroupDescription: Load balancer
+      VpcId: !Ref Vpc
       SecurityGroupIngress:
-        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0, Description: Frontend }
-        - { IpProtocol: tcp, FromPort: 5000, ToPort: 5000, CidrIp: !Ref AdminCidr, Description: Backend (direct) }
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0 }
+        - { IpProtocol: tcp, FromPort: 5000, ToPort: 5000, CidrIp: !Ref AdminCidr }
 
   FrontendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Todo frontend tasks - :3000 from ALB only
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      GroupDescription: Frontend containers - port 3000 from the load balancer
+      VpcId: !Ref Vpc
       SecurityGroupIngress:
         - { IpProtocol: tcp, FromPort: 3000, ToPort: 3000, SourceSecurityGroupId: !Ref AlbSecurityGroup }
 
   BackendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Todo backend tasks - :5000 from ALB and frontend tasks only
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      GroupDescription: Backend containers - port 5000 from the load balancer and the frontend
+      VpcId: !Ref Vpc
       SecurityGroupIngress:
         - { IpProtocol: tcp, FromPort: 5000, ToPort: 5000, SourceSecurityGroupId: !Ref AlbSecurityGroup }
         - { IpProtocol: tcp, FromPort: 5000, ToPort: 5000, SourceSecurityGroupId: !Ref FrontendSecurityGroup }
 
-  # ---------- Load balancer ----------
+  # ---------- Load balancer: :80 -> frontend, :5000 -> backend ----------
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internet-facing
       Type: application
       SecurityGroups: [!Ref AlbSecurityGroup]
-      Subnets:
-        - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet1" }
-        - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet2" }
+      Subnets: [!Ref PublicSubnet1, !Ref PublicSubnet2]
 
   FrontendTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      VpcId: !Ref Vpc
       TargetType: ip
       Protocol: HTTP
       Port: 3000
       HealthCheckPath: /health
       HealthCheckIntervalSeconds: 15
       HealthyThresholdCount: 2
-      TargetGroupAttributes:
-        - { Key: deregistration_delay.timeout_seconds, Value: "10" }
 
   BackendTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      VpcId: !Ref Vpc
       TargetType: ip
       Protocol: HTTP
       Port: 5000
       HealthCheckPath: /health
       HealthCheckIntervalSeconds: 15
       HealthyThresholdCount: 2
-      TargetGroupAttributes:
-        - { Key: deregistration_delay.timeout_seconds, Value: "10" }
 
   FrontendListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -109,12 +174,12 @@ Resources:
       DefaultActions:
         - { Type: forward, TargetGroupArn: !Ref BackendTargetGroup }
 
-  # ---------- Service discovery ----------
+  # ---------- Service discovery: frontend finds the backend at backend.todo.internal ----------
   Namespace:
     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
     Properties:
       Name: todo.internal
-      Vpc: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
+      Vpc: !Ref Vpc
 
   BackendDiscoveryService:
     Type: AWS::ServiceDiscovery::Service
@@ -151,51 +216,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
-  # ---------- SQLite storage ----------
-  # A Fargate task's own disk is wiped whenever the task is replaced (deploy,
-  # crash, scale to 0). EFS is a network disk that outlives tasks, so the SQLite
-  # file at /data/app.db survives. Deleting this stack deletes the data.
-  EfsSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Todo EFS - NFS from backend tasks only
-      VpcId: { "Fn::ImportValue": !Sub "${BaseStackName}-VpcId" }
-      SecurityGroupIngress:
-        - { IpProtocol: tcp, FromPort: 2049, ToPort: 2049, SourceSecurityGroupId: !Ref BackendSecurityGroup }
-
-  FileSystem:
-    Type: AWS::EFS::FileSystem
-    Properties:
-      Encrypted: true
-      PerformanceMode: generalPurpose
-      ThroughputMode: bursting
-      FileSystemTags:
-        - { Key: Name, Value: !Sub "${AWS::StackName}-sqlite" }
-
-  MountTarget1:
-    Type: AWS::EFS::MountTarget
-    Properties:
-      FileSystemId: !Ref FileSystem
-      SubnetId: { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet1" }
-      SecurityGroups: [!Ref EfsSecurityGroup]
-
-  MountTarget2:
-    Type: AWS::EFS::MountTarget
-    Properties:
-      FileSystemId: !Ref FileSystem
-      SubnetId: { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet2" }
-      SecurityGroups: [!Ref EfsSecurityGroup]
-
-  # Pins every file operation to uid/gid 1000 in /sqlite, whatever user the container runs as.
-  AccessPoint:
-    Type: AWS::EFS::AccessPoint
-    Properties:
-      FileSystemId: !Ref FileSystem
-      PosixUser: { Uid: "1000", Gid: "1000" }
-      RootDirectory:
-        Path: /sqlite
-        CreationInfo: { OwnerUid: "1000", OwnerGid: "1000", Permissions: "0755" }
-
   BackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -204,25 +224,15 @@ Resources:
       NetworkMode: awsvpc
       Cpu: "256"
       Memory: "512"
-      # Images are built on an Apple Silicon Mac; ARM64 Fargate runs them natively and is ~20% cheaper.
       RuntimePlatform: { CpuArchitecture: ARM64, OperatingSystemFamily: LINUX }
       ExecutionRoleArn: !GetAtt ExecutionRole.Arn
-      Volumes:
-        - Name: sqlite
-          EFSVolumeConfiguration:
-            FilesystemId: !Ref FileSystem
-            TransitEncryption: ENABLED
-            AuthorizationConfig: { AccessPointId: !Ref AccessPoint, IAM: DISABLED }
       ContainerDefinitions:
         - Name: backend
-          Image: !Ref BackendImage
+          Image: !Sub "${BackendRepository.RepositoryUri}:${ImageTag}"
           Essential: true
           PortMappings: [{ ContainerPort: 5000 }]
           Environment:
             - { Name: PORT, Value: "5000" }
-            - { Name: DB_PATH, Value: /data/app.db }
-          MountPoints:
-            - { SourceVolume: sqlite, ContainerPath: /data }
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -242,12 +252,11 @@ Resources:
       ExecutionRoleArn: !GetAtt ExecutionRole.Arn
       ContainerDefinitions:
         - Name: frontend
-          Image: !Ref FrontendImage
+          Image: !Sub "${FrontendRepository.RepositoryUri}:${ImageTag}"
           Essential: true
           PortMappings: [{ ContainerPort: 3000 }]
           Environment:
             - { Name: PORT, Value: "3000" }
-            # Same role as `http://flask_app:5000` in docker-compose: a DNS name, not an IP.
             - { Name: FLASK_SUBMIT_URL, Value: "http://backend.todo.internal:5000/submittodoitem" }
           LogConfiguration:
             LogDriver: awslogs
@@ -258,8 +267,7 @@ Resources:
 
   BackendService:
     Type: AWS::ECS::Service
-    # Mount targets must exist before a task tries to mount EFS.
-    DependsOn: [BackendListener, MountTarget1, MountTarget2]
+    DependsOn: [BackendListener, DefaultRoute]
     Properties:
       ServiceName: backend
       Cluster: !Ref Cluster
@@ -268,20 +276,12 @@ Resources:
       DesiredCount: !Ref DesiredCount
       HealthCheckGracePeriodSeconds: 30
       DeploymentConfiguration:
-        # A bad image rolls back to the last working task definition instead of looping forever.
         DeploymentCircuitBreaker: { Enable: true, Rollback: true }
-        # Stop the old task before starting the new one, so only one process ever
-        # writes the SQLite file. Costs ~1 minute of backend downtime per deploy.
-        MinimumHealthyPercent: 0
-        MaximumPercent: 100
       NetworkConfiguration:
         AwsvpcConfiguration:
-          # Public IP so tasks can pull images from ECR without a NAT gateway (~$32/month).
           AssignPublicIp: ENABLED
           SecurityGroups: [!Ref BackendSecurityGroup]
-          Subnets:
-            - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet1" }
-            - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet2" }
+          Subnets: [!Ref PublicSubnet1, !Ref PublicSubnet2]
       LoadBalancers:
         - { ContainerName: backend, ContainerPort: 5000, TargetGroupArn: !Ref BackendTargetGroup }
       ServiceRegistries:
@@ -303,18 +303,18 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups: [!Ref FrontendSecurityGroup]
-          Subnets:
-            - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet1" }
-            - { "Fn::ImportValue": !Sub "${BaseStackName}-PublicSubnet2" }
+          Subnets: [!Ref PublicSubnet1, !Ref PublicSubnet2]
       LoadBalancers:
         - { ContainerName: frontend, ContainerPort: 3000, TargetGroupArn: !Ref FrontendTargetGroup }
 
 Outputs:
+  BackendRepositoryUri:
+    Value: !GetAtt BackendRepository.RepositoryUri
+  FrontendRepositoryUri:
+    Value: !GetAtt FrontendRepository.RepositoryUri
   FrontendUrl:
     Value: !Sub "http://${LoadBalancer.DNSName}/"
   BackendUrl:
     Value: !Sub "http://${LoadBalancer.DNSName}:5000/"
   ClusterName:
     Value: !Ref Cluster
-  LogGroup:
-    Value: !Ref LogGroup
