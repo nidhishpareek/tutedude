@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevOps — lecture notes</title>
+<style>
+  :root {
+    --paper: #f4efe4;
+    --card: #fffaf2;
+    --ink: #2a241c;
+    --muted: #5c5348;
+    --line: #e2d6c4;
+    --accent: #1f6b45;
+    --green: #e7f4ea;
+    --green-line: #8fbf9d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    line-height: 1.55;
+    font-size: 18px;
+  }
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.4rem 1.3rem 4rem;
+  }
+  h1 { font-size: 2.2rem; line-height: 1.2; margin: 0 0 0.6rem; }
+  h2 { font-size: 1.55rem; margin: 0 0 0.4rem; }
+  h3 { font-size: 1.15rem; margin: 0 0 0.35rem; }
+  h4 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+  p { margin: 0.4rem 0 0.8rem; }
+  a { color: #1a4d8c; }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.86em;
+    background: #efe6d6;
+    padding: 0.05em 0.28em;
+    border-radius: 3px;
+  }
+  .intro { color: var(--muted); }
+  nav.contents {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem 1rem;
+    margin: 1.2rem 0 1.8rem;
+  }
+  nav.contents ol { margin: 0.3rem 0 0; padding-left: 1.3rem; }
+  nav.contents li { margin: 0.2rem 0; }
+  section.unit {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.2rem 1.25rem 1.1rem;
+    margin: 0 0 1.4rem;
+  }
+  section.unit > p.lead { color: var(--muted); margin-top: 0; }
+  article.lecture {
+    border-top: 1px solid var(--line);
+    padding: 0.85rem 0 0.2rem;
+  }
+  article.lecture h3 { font-weight: 600; }
+  article.lecture ul, .closer ul { margin: 0.2rem 0 0.6rem; padding-left: 1.2rem; }
+  article.lecture li, .closer li { margin: 0.28rem 0; }
+  .def { margin: 0.15rem 0 0.45rem; }
+  .closer {
+    background: var(--green);
+    border: 1px solid var(--green-line);
+    border-radius: 10px;
+    padding: 0.85rem 1rem 0.4rem;
+    margin-top: 0.6rem;
+  }
+  .closer h3 { color: var(--accent); }
+  .note { font-size: 1.02rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>DevOps — lecture notes</h1>
+<p class="intro">These notes follow the TuteDude DevOps course in folder order. Watch the platform tour first, then the DevOps and cloud introductions, Linux, Python, Flask with MongoDB, Git, Docker, AWS, Kubernetes, Terraform, and CI/CD. Bash is the Linux shell used throughout, not a separate lecture. The running demo app is called Fenrir in Kubernetes and Aries in Docker and AWS. The instructor works in region <code>ap-south-1</code> (Mumbai) unless a later video switches to Google Cloud. Speech-to-text names are corrected here: EC2, IaaS, PaaS, SaaS, Git, Docker, Kubernetes, Terraform, Jenkins, Nginx, gunicorn, and the rest of the service names.</p>
+
+<nav class="contents">
+<h2>Contents</h2>
+<ol>
+<li><a href="#unit-01">Getting started with the TuteDude platform</a></li>
+<li><a href="#unit-02">Introduction to DevOps</a></li>
+<li><a href="#unit-03">Cloud computing</a></li>
+<li><a href="#unit-04">Linux basics</a></li>
+<li><a href="#unit-05">Scripting (Python and Bash)</a></li>
+<li><a href="#unit-06">REST APIs with Flask and MongoDB</a></li>
+<li><a href="#unit-07">Version control — Git</a></li>
+<li><a href="#unit-08">Docker</a></li>
+<li><a href="#unit-09">AWS</a></li>
+<li><a href="#unit-10">Kubernetes</a></li>
+<li><a href="#unit-11">Terraform</a></li>
+<li><a href="#unit-12">Continuous integration — Jenkins, CircleCI, GitHub Actions</a></li>
+</ol>
+</nav>
+
+<section class="unit" id="unit-01">
+<h2>01 — Getting started with the TuteDude platform</h2>
+<article class="lecture" id="lecture-001">
+<h3>001 — Getting Started with TuteDude</h3>
+<p class="note">This is a platform tour, not a lab. The dashboard holds lectures, a ZIP or public Drive or GitHub link for each assignment, resources, evening mentorship, community, and live sessions. The certificate needs about half the course finished and every assignment approved, after which the course fee is refunded.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Clicking through the student dashboard and pointing at where lectures, assignments, and the certificate live.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Find a lecture and its assignment box.</li>
+<li>Submit work as a ZIP or a public link.</li>
+<li>Know that mentorship is scheduled in the evening.</li>
+<li>Know the certificate rule: half the course plus approved assignments.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-02">
+<h2>02 — Introduction to DevOps</h2>
+<article class="lecture" id="lecture-002">
+<h3>002 — Introduction</h3>
+<ul>
+<li>DevOps joins development and operations: host, deploy, monitor, maintain, and scale an app after the code is written.</li>
+<li>He sketches the software lifecycle with feedback loops, and names waterfall and agile as two ways teams plan that work.</li>
+<li>CI means take local changes into the source repo, run tests, and package the result. CD means deliver that package onto the server.</li>
+<li>A container packages the runtime, libraries, code, and files so the same environment runs on a laptop or a server. His example is Python plus pandas plus a CSV.</li>
+<li>The course path he announces: Linux and Bash, Python, Flask, Git, Docker, AWS, Kubernetes, Terraform, then CI/CD. He also names Ansible, Chef, and Nginx as config and web tools you will meet later.</li>
+<li>Cloud providers he will use: AWS as the main one, Azure for data and streaming, GCP for Kubernetes and build pipelines. He also mentions Linode, OpenShift, and DigitalOcean.</li>
+</ul>
+<p class="def"><strong>DevOps.</strong> The practice of one person or team owning both the code and the systems that run it.</p>
+<p class="def"><strong>Bash.</strong> The Bourne Again Shell, the command line you type into on Linux. Other shells exist, such as zsh and fish.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Drawing the DevOps loop and naming the tools the rest of the course will install. No commands yet.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Say what DevOps covers beyond writing features.</li>
+<li>Separate CI (build and test) from CD (put it on a server).</li>
+<li>Explain why a container exists, using the “works on my machine” problem.</li>
+<li>Name the watch order: Linux, Python, Flask, Git, Docker, AWS, Kubernetes, Terraform, CI/CD.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-03">
+<h2>03 — Cloud computing</h2>
+<article class="lecture" id="lecture-003">
+<h3>003 — Introduction to Cloud</h3>
+<ul>
+<li>Cloud means the machines live in someone else’s data centre, not under your desk.</li>
+<li>He splits clouds into private (only your company), public (AWS, Azure, GCP), and hybrid (both).</li>
+<li>He draws the service stack. Use the standard meanings, which he restates correctly in the AWS unit: IaaS is hardware you manage (EC2), PaaS is a platform you drop code onto (Elastic Beanstalk), SaaS is finished software you just open (YouTube, Sheets, Excel).</li>
+<li>He names GitHub as a platform that hosts Git, which is the PaaS idea: you bring the repo, they run the service.</li>
+<li>No console clicks in this lecture. It is the vocabulary for the AWS unit.</li>
+</ul>
+<p class="def"><strong>IaaS.</strong> The provider gives CPU, memory, and disk. You install the operating system and the app.</p>
+<p class="def"><strong>PaaS.</strong> The provider gives a runtime. You give it code and it runs it.</p>
+<p class="def"><strong>SaaS.</strong> The provider gives a finished application you use in a browser.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Drawing private, public, and hybrid clouds, then the IaaS / PaaS / SaaS stack.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Place EC2 on IaaS, Elastic Beanstalk on PaaS, and a website like YouTube on SaaS.</li>
+<li>Say why a company might keep a private cloud and still use AWS.</li>
+<li>Explain hybrid as both sides talking to each other.</li>
+<li>Pick a provider for a later lab: AWS unless the lecture says GCP.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-04">
+<h2>04 — Linux basics</h2>
+<p class="lead">Ubuntu is the distro he recommends. Open a terminal with Ctrl+Alt+T. He keeps a command gist called Linux Commands Tutorial.</p>
+<article class="lecture" id="lecture-004">
+<h3>004 — Basics of Linux Part-1</h3>
+<ul>
+<li>Linux is an operating system, like Windows or macOS. The kernel talks to the hardware. A distro is a full system built on that kernel.</li>
+<li>He names Ubuntu for daily use, Kali for security, Debian as Ubuntu’s parent, CentOS for servers, Alpine as a tiny image, plus Arch and Fedora. Linux is mostly C, GPL-2, started by Linus Torvalds, who also made Git.</li>
+<li>File tree he points at: <code>/bin</code> for programs (<code>whereis ls</code> shows <code>/bin/ls</code>), <code>/etc</code> for config, <code>/home</code> for users, <code>/var</code> for logs, <code>/mnt</code> for disks you mount later.</li>
+<li>Navigation: <code>pwd</code>, <code>ls</code>, <code>ls -a</code>, <code>ls -l</code>, <code>ls -al</code>, <code>cd</code>, <code>cd ..</code>, <code>cd -</code> for the previous folder, Tab to complete, up and down for history, <code>clear</code>.</li>
+<li>Files: <code>mkdir</code> (no spaces; use <code>-</code> or <code>_</code>), <code>touch</code>, <code>mv</code> to move or rename, <code>cp</code>, <code>rm</code>, <code>rm -rf</code> which deletes with no recycle bin, <code>ln -s</code> for a symlink.</li>
+<li>Reading: <code>cat</code> for files, <code>echo</code>, <code>man</code> then <code>q</code> to quit. Identity: <code>uname</code>, <code>uname -a</code>, <code>whoami</code>. Paste in the terminal is Ctrl+Shift+V.</li>
+</ul>
+<p class="def"><strong>Distribution.</strong> A packaged Linux system: kernel plus the tools and installer a vendor chose.</p>
+<p class="def"><strong>Root user.</strong> The administrator. On root, <code>sudo</code> is unnecessary and sometimes missing.</p>
+</article>
+<article class="lecture" id="lecture-005">
+<h3>005 — Basics of Linux Part-2</h3>
+<ul>
+<li>Archives: <code>tar -cvf archive.tar folder</code> to pack, <code>tar -xvf archive.tar</code> to unpack. <code>zip</code> and <code>unzip</code> when the other machine is not Linux.</li>
+<li>Search and slices: <code>grep</code> on a pipe, <code>grep -n</code> for line numbers, <code>head</code>, <code>tail</code>, <code>head -n 5</code>, <code>tail -n 5</code>.</li>
+<li>Environment: <code>export NAME=value</code> lasts for this shell only. <code>echo $HOME</code> and <code>printenv</code> show what is set.</li>
+<li>Processes and disk: <code>ps</code>, <code>ps aux</code>, <code>ps | grep</code>, <code>kill PID</code>, <code>service --status-all</code> (<code>+</code> running, <code>-</code> stopped), <code>df</code>, <code>df -h</code>, <code>top</code>.</li>
+<li>Permissions: <code>chmod +x file</code> makes it runnable. <code>chmod 777</code> is read-write-execute for everyone. He says not to use 777 on real files. Letters are rwx for user, group, and others.</li>
+<li>Network and packages: <code>ifconfig</code> (docker0, wlan, lo), <code>curl URL</code> prints the body, <code>wget URL</code> saves a file. Ubuntu uses <code>apt</code>: <code>sudo apt update</code>, <code>sudo apt upgrade</code>, <code>sudo apt install cowsay</code>, <code>sudo apt remove cowsay</code>. CentOS uses yum or rpm, Alpine uses apk, Arch uses pacman. Snap is Ubuntu’s own store.</li>
+<li>He also installs <code>cmatrix</code>, <code>neofetch</code>, and mentions <code>btop</code>. Aliases such as <code>alias c='clear'</code> die when the shell closes. SSH, services, and <code>ufw</code> wait until Nginx and AWS.</li>
+</ul>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Walking the filesystem, creating and deleting files, packing a tar, grepping output, installing a joke package with apt, and setting a one-session alias.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Move around with <code>pwd</code>, <code>ls -al</code>, and <code>cd</code>, and create a folder whose name has no spaces.</li>
+<li>Copy, move, and remove files, including a symlink with <code>ln -s</code>.</li>
+<li>Read a file with <code>cat</code>, search it with <code>grep</code>, and look up a command with <code>man</code>.</li>
+<li>Update Ubuntu and install a package with <code>sudo apt update</code> and <code>sudo apt install</code>.</li>
+<li>Check disk with <code>df -h</code> and stop a process with <code>kill</code> after finding it in <code>ps aux</code>.</li>
+<li>Make a script executable with <code>chmod +x</code> and explain why <code>chmod 777</code> is too open.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-05">
+<h2>05 — Scripting (Python and Bash)</h2>
+<p class="lead">There is no separate Bash lecture. Bash is the shell from unit 04. This unit is Python 3. He uses 3.10, wants 3.8 or newer, and writes files in VS Code with auto-save on.</p>
+<article class="lecture" id="lecture-006">
+<h3>006 — Basics of Python Part-1</h3>
+<ul>
+<li>Python is high-level, interpreted, and dynamically typed. Python 2 is retired. Install from python.org, or use Miniconda or Anaconda if you want a package manager. Run a file with <code>python3 file.py</code>.</li>
+<li>He creates <code>first.py</code> with <code>print("Hello world")</code>, then <code>my_data_types.py</code> and <code>basic_objects.py</code>.</li>
+<li>Types he types: <code>str</code> in quotes, <code>int</code>, <code>float</code>, <code>bool</code> as <code>True</code> or <code>False</code>. A variable is <code>a = 10</code>. Math is <code>+</code> <code>-</code> <code>*</code> <code>/</code>.</li>
+<li>Strings: <code>.capitalize()</code> and <code>.upper()</code>. A comment is <code>#</code>. <code>\n</code> is a newline and <code>\t</code> is a tab.</li>
+<li>A list <code>[]</code> is mutable and starts at index 0. A slice <code>a[1:5]</code> stops before 5. He uses <code>append</code> and <code>del</code>. A tuple <code>()</code> cannot change. A set <code>{}</code> keeps unique values. A dict is <code>{key: value}</code> with a colon and commas. Delete with <code>del dict[key]</code> and add with <code>dict[k] = v</code>.</li>
+</ul>
+<p class="def"><strong>Interpreter.</strong> A program that runs your source line by line, instead of compiling it to a binary first.</p>
+</article>
+<article class="lecture" id="lecture-007">
+<h3>007 — Basics of Python Part-2</h3>
+<ul>
+<li>He writes <code>if_statements.py</code>. Branches are <code>if</code>, <code>elif</code>, and <code>else</code>. Comparisons are <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>. Indentation is the block.</li>
+<li><code>input()</code> always returns a string. Wrap it in <code>int()</code> when you need a number.</li>
+<li><code>for_loops.py</code>: <code>for i in some_list</code> and <code>for i in range(10)</code>, which is 0 through 9. <code>list(range(10))</code> makes that into a list.</li>
+<li>Modules: <code>import datetime</code> then <code>datetime.datetime.now()</code>, or <code>from datetime import datetime</code>, or <code>from math import sqrt</code>.</li>
+<li>His own module is a folder <code>basic/</code> with <code>fruits.py</code> holding <code>apples = 10</code>, <code>bananas = 20</code>, <code>oranges = 30</code>. The caller does <code>from basic import fruits</code>.</li>
+<li>Files: modes <code>r</code> <code>w</code> <code>a</code> <code>r+</code> <code>w+</code> <code>rb</code>. He opens <code>data.txt</code>, reads with <code>read</code>, <code>readline</code>, or <code>readlines</code>, writes, and closes. Errors go in <code>try</code> / <code>except</code> in <code>trial_error.py</code>.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-008">
+<h3>008 — Basics of Python Part-3</h3>
+<ul>
+<li>A function is <code>def name():</code> with an indented body, called with <code>()</code>. It can <code>return</code> a value, take arguments, and sit inside another function.</li>
+<li>Functions are values. You can assign one to a name without calling it, then call the new name later.</li>
+<li>Packages come from PyPI. He runs <code>pip3 install Faker</code>, then <code>from faker import Faker</code> and calls <code>fake.name()</code>, <code>.city()</code>, <code>.country()</code>, and <code>.address()</code> in <code>faker_tutorial.py</code>.</li>
+<li>A <code>while</code> loop in <code>while_tutorials.py</code>: start <code>i</code> at 0, print while <code>i &lt; 10</code>, then <code>i = i + 1</code> or <code>i = i + 2</code>.</li>
+<li>He compares package tools: pip for Python, npm for Node, modules for Go, Gradle or Maven for Java.</li>
+<li>He defines a program as one file that runs, and software as many programs working together. Keywords are reserved words. Identifiers are the names you invent.</li>
+</ul>
+<p class="def"><strong>PyPI.</strong> The public index pip downloads packages from.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Creating small <code>.py</code> files in VS Code and running each one with <code>python3</code>. He installs Faker, builds a tiny package folder, and reads and writes <code>data.txt</code>.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Run a script with <code>python3 file.py</code> and install a library with <code>pip3 install</code>.</li>
+<li>Use lists, tuples, sets, and dicts, and slice a list without including the end index.</li>
+<li>Write <code>if</code> / <code>elif</code> / <code>else</code> and both <code>for</code> and <code>while</code> loops with correct indentation.</li>
+<li>Turn <code>input()</code> into an <code>int</code> before doing math.</li>
+<li>Import a standard module and your own module from a folder.</li>
+<li>Open a file, read or append, close it, and catch a failure with <code>try</code> / <code>except</code>.</li>
+<li>Write a function that takes arguments and returns a value.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-06">
+<h2>06 — REST APIs using Flask and MongoDB</h2>
+<article class="lecture" id="lecture-009">
+<h3>009 — Flask Framework Part-1</h3>
+<ul>
+<li>A web framework gives you routes and request handling. A web server is the process that listens on a port. Django is batteries-included. Flask is small. He also names web2py, Bottle, and CherryPy. Express is the Node equivalent.</li>
+<li>REST is a client asking and a server answering. A URL has a protocol (<code>http</code> or <code>https</code>), host and port, a path, and an optional query string. JSON looks like a Python dict.</li>
+<li>GET asks for data, often in the query string. POST sends a body. He also names PUT, PATCH, and DELETE. Status 200 is success, 404 is missing, 500 is the server’s fault.</li>
+<li>In Postman he calls <code>https://reqres.in/api/users</code> and the same URL with <code>?page=2</code>, saved in a collection named DevOps course.</li>
+<li>Install with <code>pip install Flask</code>. Folder <code>Flask tutorial</code>, file <code>app.py</code>: <code>app = Flask(__name__)</code>, <code>@app.route("/")</code>, and <code>app.run(debug=True)</code> under <code>if __name__ == "__main__":</code>. Debug reloads on save.</li>
+<li>He adds <code>/about</code> and <code>/second</code>, a path parameter <code>/api/&lt;name&gt;</code>, and <code>/add/&lt;a&gt;/&lt;b&gt;</code> that converts both parts with <code>int()</code> and returns a dict, not a bare int. Query values come from <code>request.args.get("name")</code>.</li>
+<li>Templates live in <code>templates/index.html</code>. <code>render_template("index.html", day_of_week=...)</code> fills Jinja <code>{{ day_of_week }}</code>. He uses the weekday and <code>strftime</code> for a <code>/time</code> page. A form uses <code>method="POST"</code> and <code>action="/submit"</code>. Read it with <code>request.form.get("name")</code>, not <code>request.args</code>.</li>
+</ul>
+<p class="def"><strong>JSON.</strong> A text format for objects and lists. In Python you treat it like a dict.</p>
+<p class="def"><strong>Jinja.</strong> The template language Flask uses so HTML can print Python values.</p>
+</article>
+<article class="lecture" id="lecture-010">
+<h3>010 — Flask Framework Part-2</h3>
+<ul>
+<li>Relational databases (MySQL, Postgres, Oracle) store tables. Document databases (MongoDB, CouchDB) store JSON documents. A group of documents is a collection. Collections make a database. He also names Neo4j for graphs, Redis for key-value cache, and Google Drive or S3 for blobs.</li>
+<li>On cloud.mongodb.com he creates a free Atlas cluster in Mumbai named tram. Database user <code>dummy</code> with password <code>1234</code> and the Atlas admin role, not a temporary user. Network access is <code>0.0.0.0/0</code>. He says that is wide open. A tighter rule uses your public IP from a site such as ifconfig.me.</li>
+<li>Connect → Drivers → Python. Copy the URI, replace <code>&lt;password&gt;</code>. <code>requirements.txt</code> lists flask, pymongo, dnspython, and python-dotenv. <code>.env</code> holds <code>MONGO_URI</code>. Load it with <code>load_dotenv()</code> and <code>os.getenv</code>.</li>
+<li><code>client["test"]</code> is the database and <code>db["flask_tutorial"]</code> is the collection. <code>insert_one</code> needs a dict. Do not return the <code>ObjectId</code> in JSON. Return a plain success string. <code>find()</code> is a cursor. Turn it into a list, delete each <code>_id</code>, and wrap it as <code>{"data": ...}</code>.</li>
+<li>He splits a monolith into <code>frontend/</code> and <code>backend/</code>. Backend listens on port 9000 and host <code>0.0.0.0</code>. Frontend listens on 8000 and posts JSON with the <code>requests</code> package to <code>backend_url + "/submit"</code>. The backend reads <code>request.json</code>, not <code>request.form</code>. A GET <code>/view</code> uses <code>jsonify</code>. The browser button is a link to <code>/get_data</code>.</li>
+<li>Install with <code>pip install -r requirements.txt</code> and start with <code>python3 app.py</code>.</li>
+</ul>
+<p class="def"><strong>Microservice.</strong> One small app that does one job and talks to the others over HTTP. A monolith is all of that in one process.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Building <code>app.py</code> and <code>templates/index.html</code>, calling a public API in Postman, creating an Atlas cluster, writing <code>.env</code> and <code>requirements.txt</code>, inserting a signup form into Mongo, then splitting the app into two Flask processes on ports 8000 and 9000.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Start a Flask app with debug on and add a route that returns text or a dict.</li>
+<li>Read a query string with <code>request.args</code> and a form with <code>request.form</code>.</li>
+<li>Render a Jinja template and print a variable with <code>{{ }}</code>.</li>
+<li>Create a free Atlas user, open the network, and connect with pymongo from a <code>.env</code> URI.</li>
+<li>Insert a document and list documents after stripping <code>_id</code>.</li>
+<li>Split frontend and backend and send JSON with the <code>requests</code> library.</li>
+</ul>
+</div>
+</section>
+<section class="unit" id="unit-07">
+<h2>07 — Version control — Git</h2>
+<article class="lecture" id="lecture-011">
+<h3>011 — Introduction to Git</h3>
+<ul>
+<li>Version control keeps every saved snapshot of a project. Git is the tool. GitHub is Microsoft’s host for Git repos. GitLab and Bitbucket are other hosts. GitLab is the one he associates with CI and security scans.</li>
+<li>Linus Torvalds built Git after an older, slower system. Git is not the same thing as GitHub.</li>
+<li>Install: Linux often already has it, otherwise <code>sudo apt install git</code>. Mac is <code>brew install git</code>. Windows uses the installer plus Git Bash. Check with <code>git --version</code>.</li>
+<li>He creates a folder (he calls it Athena in later videos) and an <code>index.html</code> that says Git tutorial. This lecture is the vocabulary before the commands.</li>
+</ul>
+<p class="def"><strong>Git.</strong> The program on your machine that records commits.</p>
+<p class="def"><strong>GitHub.</strong> A website that stores Git repositories so other people can clone them.</p>
+</article>
+<article class="lecture" id="lecture-012">
+<h3>012 — Git Basics</h3>
+<ul>
+<li>Inside the project folder he runs <code>git init</code>. The first branch is <code>master</code>. He notes that many hosts now call that branch <code>main</code>.</li>
+<li>VS Code’s source control marks a new file with a green U (untracked) and a changed file with a brown M (modified).</li>
+<li><code>git add file</code> or <code>git add .</code> stages work. <code>git status</code> shows what is staged. <code>git restore --staged file</code> takes a file back out of the stage.</li>
+<li>The hidden <code>.git</code> folder is the database. He says never edit it by hand.</li>
+<li>He sets short aliases he will reuse: <code>ga</code> for add, and log aliases that expand to <code>git log --stat</code> and <code>git log --oneline --decorate --graph --all</code>.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-013">
+<h3>013 — Commits</h3>
+<ul>
+<li><code>git commit -m "message"</code> saves the staged snapshot. <code>git log</code> shows author, email, date, and the hash.</li>
+<li>HEAD is the latest commit. <code>git diff hash</code> shows what changed since that commit.</li>
+<li>You cannot delete a commit in the middle of history. You can only move HEAD backwards. <code>git reset --hard hash</code> throws away every commit after that hash. He treats that as destructive.</li>
+<li>He edits <code>index.html</code>, then adds <code>hello.txt</code> and <code>data.html</code>, committing after each change so the log has several entries.</li>
+</ul>
+<p class="def"><strong>Commit.</strong> A saved snapshot with a message, an author, and a hash.</p>
+<p class="def"><strong>HEAD.</strong> The name Git uses for the commit you are standing on.</p>
+</article>
+<article class="lecture" id="lecture-014">
+<h3>014 — GitHub</h3>
+<ul>
+<li>He generates a key with <code>ssh-keygen</code> using his GitHub email, then <code>cat ~/.ssh/id_rsa.pub</code> and pastes it into GitHub → Settings → SSH and GPG keys as an authentication key.</li>
+<li>He creates a private repo named Athena. <code>git remote add origin git@github.com:.../athena.git</code>, then <code>git remote -v</code>.</li>
+<li>The first push is <code>git push -u origin master</code> (or <code>--set-upstream</code>). Later pushes are just <code>git push</code>.</li>
+<li>GitHub Pages: Settings → Pages → deploy from branch <code>master</code> at the root. The repo needs an <code>index.html</code>. A private repo can take a while to publish.</li>
+<li>He writes <code>README.md</code>. <code>#</code> is a big heading, <code>##</code> is smaller, and an image is <code>![alt](url)</code>. He mentions readme.so and VS Code’s Ctrl+Shift+V preview. He also saves the keygen steps in <code>newkey.txt</code> and a command recap in <code>recap.txt</code>.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-015">
+<h3>015 — Remotes GitLab</h3>
+<ul>
+<li>One local repo can have two remotes. <code>origin</code> stays GitHub. He adds GitLab with <code>git remote add glorigin git@gitlab.com:...</code>.</li>
+<li>The same public key is pasted into GitLab’s SSH keys page. The private key stays on the laptop.</li>
+<li><code>git push glorigin master</code> sends the same commits to GitLab without changing GitHub.</li>
+<li>He uses this to show that Git is local and the host is just a remote URL.</li>
+</ul>
+<p class="def"><strong>Remote.</strong> A nickname for a URL where you push and pull commits.</p>
+</article>
+<article class="lecture" id="lecture-016">
+<h3>016 — Branching</h3>
+<ul>
+<li><code>git branch -a</code> lists branches. He describes remotes in one colour and the current local branch with a star.</li>
+<li><code>git branch feat1</code> creates a branch. <code>git switch feat1</code> moves onto it. The older form is <code>git checkout -b feat2</code> and <code>git checkout feat1</code>.</li>
+<li>The first push of a new branch needs <code>git push -u origin feat1</code>.</li>
+<li>If he edits a file on the GitHub website, the laptop is behind until <code>git pull</code>.</li>
+<li>To merge, stand on the target: <code>git switch master</code>, then <code>git merge feat1</code>, then <code>git push</code>.</li>
+<li>He mentions rebase as replaying commits in a straight line, and says day-to-day work uses merge. A merge commit is the join point.</li>
+</ul>
+<p class="def"><strong>Branch.</strong> A movable label for a line of commits, so two features can be saved separately.</p>
+</article>
+<article class="lecture" id="lecture-017">
+<h3>017 — Pull Requests</h3>
+<ul>
+<li>He pushes <code>feat3</code> and opens a pull request on GitHub from <code>feat3</code> into <code>master</code>. GitLab calls the same thing a merge request.</li>
+<li>When both sides edited the same lines, GitHub shows a conflict. He keeps one side or both, marks the file resolved, and merges in the browser.</li>
+<li>After the website merge, the laptop still has the old <code>master</code> until <code>git pull</code>.</li>
+<li>The rule he repeats: do the review on the host, then update the laptop. Do not merge a conflicted file without reading both sides.</li>
+</ul>
+<p class="def"><strong>Pull request.</strong> A request for someone to merge your branch into another branch after they have looked at the diff.</p>
+</article>
+<article class="lecture" id="lecture-018">
+<h3>018 — Forking</h3>
+<ul>
+<li>A fork is your copy of someone else’s public repo. He forks a repo he calls Minerva, clones the fork, commits, and pushes to his own GitHub.</li>
+<li>Contribute → Open pull request sends the commits back to the original repo. Only the upstream owner can merge that request.</li>
+<li>Later upstream commits are pulled with the Sync fork button, then a pull on the laptop.</li>
+<li>He points at the Linux kernel as the real-world version of this flow.</li>
+</ul>
+<p class="def"><strong>Fork.</strong> A remote copy of a repo under your account, so you can push without write access to the original.</p>
+</article>
+<article class="lecture" id="lecture-019">
+<h3>019 — Stashing</h3>
+<ul>
+<li>If you have unfinished edits and need to switch branches, <code>git stash</code> shelves them. <code>git stash list</code> shows the shelf.</li>
+<li>He switches branch, does other work, switches back, then <code>git stash apply</code>. A numbered stash is <code>stash@{n}</code>.</li>
+<li><code>git stash drop</code> removes one entry. <code>git stash clear</code> removes all of them. Daily use is <code>git stash</code> and <code>git stash pop</code>, which applies and drops in one step.</li>
+<li>Recap he writes down: <code>git init</code>, <code>git remote add origin URL</code>, change files, <code>git add</code>, <code>git commit</code>, <code>git push</code>. He mentions GitKraken when you want a picture of the graph.</li>
+</ul>
+<p class="def"><strong>Stash.</strong> A temporary shelf for uncommitted edits so the working tree can change branch.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Initializing a repo, committing HTML files, making an SSH key, pushing to a private GitHub repo and a second GitLab remote, publishing Pages, branching <code>feat1</code> through <code>feat3</code>, merging, opening a pull request, forking Minerva, and stashing a half-done edit.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Start a repo and make a commit with a message.</li>
+<li>Add an SSH key and push with <code>git push -u origin master</code>.</li>
+<li>Create a branch, switch to it, and merge it back.</li>
+<li>Open a pull request and pull the result after it is merged.</li>
+<li>Fork a public repo and send changes upstream without write access.</li>
+<li>Stash work, switch branch, and pop the stash afterwards.</li>
+<li>Add a second remote and push the same commits to GitLab.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-08">
+<h2>08 — Docker</h2>
+<article class="lecture" id="lecture-020">
+<h3>020 — Introduction to Docker</h3>
+<ul>
+<li>Docker packages an app so it stops depending on whatever happens to be installed on one laptop.</li>
+<li>An image is the packed layers. A container is a running image.</li>
+<li>A virtual machine stacks hardware, a host OS, a hypervisor such as VMware, then a full guest OS and the app. That is gigabytes and includes a desktop.</li>
+<li>Docker uses the host kernel. There is no guest OS. The result is a command line only, usually megabytes rather than gigabytes.</li>
+<li>He will install the engine, run images from Docker Hub, write a Dockerfile, compose the Aries app, and push to a registry. Private registries (ECR, GCR, ACR) come in the AWS unit. Heroku’s free tier is gone, so the cloud run waits for ECS.</li>
+</ul>
+<p class="def"><strong>Image.</strong> A read-only package of filesystem layers.</p>
+<p class="def"><strong>Container.</strong> A running instance of an image.</p>
+</article>
+<article class="lecture" id="lecture-021">
+<h3>021 — Installation</h3>
+<ul>
+<li>On Ubuntu: <code>sudo apt install docker.io</code>.</li>
+<li>So you do not need sudo every time: <code>sudo groupadd docker</code>, <code>sudo usermod -aG docker $USER</code>, then <code>newgrp docker</code>.</li>
+<li>Check with <code>docker version</code> and <code>docker run hello-world</code>.</li>
+<li>He signs in at hub.docker.com. Image names look like <code>username/repo</code>.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-022">
+<h3>022 — Basic Commands</h3>
+<ul>
+<li><code>docker pull ubuntu</code>, <code>docker images</code>, <code>docker run ubuntu</code>. A plain Ubuntu container exits at once because it has nothing to do.</li>
+<li><code>docker ps</code> is running containers. <code>docker ps -a</code> includes exited ones.</li>
+<li><code>docker run -it ubuntu</code> gives a shell as root. Inside, <code>apt</code> works without sudo. He runs <code>apt update &amp;&amp; apt install vim</code> and edits a file.</li>
+<li>Leave the shell first, then <code>docker stop id</code> and later <code>docker start id</code>.</li>
+<li>Alpine uses <code>apk update</code> and <code>apk add vim</code>, not apt. Kali is <code>docker pull kalilinux/kali-rolling</code> and still uses apt.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-023">
+<h3>023 — Advanced Commands</h3>
+<ul>
+<li><code>docker run nginx</code> pulls the image if it is missing. Publish a port with <code>-p host:container</code>, so <code>-p 8000:80</code> maps your port 8000 to Nginx’s port 80. He swaps the order once on screen. The left number is always the host.</li>
+<li><code>curl</code> against the host port shows the welcome page. <code>docker logs id</code> prints what the container wrote. <code>docker run -d</code> keeps it in the background.</li>
+<li><code>docker exec -it id bash</code> opens a shell in a running container. Inside, <code>curl localhost:80</code> works. <code>localhost:8000</code> does not, because 8000 exists only on the host.</li>
+<li><code>docker inspect id</code> shows the container IP and the port bindings. He defers user-defined networks to Compose.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-024">
+<h3>024 — Docker files</h3>
+<ul>
+<li>A Dockerfile starts with <code>FROM python</code>, then he switches to <code>FROM python:3.8-alpine</code> and the image drops from about 932 MB to about 48 MB. <code>slim-buster</code> is around 112 MB.</li>
+<li>He <code>COPY</code>s <code>app.py</code>, sets a <code>WORKDIR</code>, and ends with <code>CMD</code> or <code>ENTRYPOINT</code>.</li>
+<li><code>docker build -t python-hello-world .</code> then <code>docker run python-hello-world</code>. Tags such as <code>:v2</code> mark a later build.</li>
+<li>A Node example is <code>FROM node:16-alpine</code>, <code>ENTRYPOINT ["node"]</code>, <code>CMD ["app.js"]</code>, built as <code>nodejs-hello</code>.</li>
+<li><code>RUN echo hi</code> and <code>RUN touch a.txt</code> happen at build time, not at run time.</li>
+</ul>
+<p class="def"><strong>Dockerfile.</strong> A text recipe that builds an image, one instruction per layer.</p>
+</article>
+<article class="lecture" id="lecture-025">
+<h3>025 — Image Handling</h3>
+<ul>
+<li>Old builds leave dangling images. <code>docker image prune</code> deletes them.</li>
+<li><code>docker rmi id</code> fails while a container still points at the image.</li>
+<li>Remove every stopped container with <code>docker rm $(docker ps -aq)</code> or <code>docker ps -aq | xargs docker rm</code>, then remove the image.</li>
+<li>He deletes containers and images before a rebuild so the next <code>docker build</code> is not confused with a stale tag.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-026">
+<h3>026 — Building Microservices</h3>
+<ul>
+<li>The Aries app is two services. Backend is Flask in <code>app.py</code>, listening on port 8000 and host <code>0.0.0.0</code>. If the host stays <code>127.0.0.1</code>, the published port stays closed.</li>
+<li><code>/api</code> reads <code>names.txt</code> through <code>business.py</code> and <code>get_data</code>, then <code>jsonify</code>s <code>{"data": ...}</code>. <code>requirements.txt</code> is just flask.</li>
+<li>Frontend is Express: <code>npm init -y</code>, <code>npm install express ejs node-fetch</code>, <code>app.js</code>, then an EJS page that fetches <code>process.env.BACKEND_URL</code> or a hardcoded <code>localhost:8000/api</code>.</li>
+<li><code>.dockerignore</code> lists <code>node_modules</code>. Builds: <code>docker build -t aries-backend -f Dockerfile-backend .</code> and a frontend image from <code>node:16-alpine</code> with <code>WORKDIR /app</code>, <code>npm install</code>, <code>ENTRYPOINT npm</code>, and <code>CMD start</code>.</li>
+<li>He maps host 4000 to container 8000 for the backend. The frontend container cannot reach the backend through <code>localhost</code> until they share a network. That is the next lecture.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-027">
+<h3>027 — Docker Compose</h3>
+<ul>
+<li>Install the Compose plugin and check <code>docker-compose --version</code>.</li>
+<li><code>docker-compose.yaml</code> has a version and two services. Backend builds from <code>./backend</code>, sets <code>hostname: backend-host</code>, and publishes <code>8000:8000</code>. Frontend builds from <code>./frontend</code>, sets <code>BACKEND_URL</code> to <code>http://backend-host...</code>, and uses <code>depends_on</code> plus <code>links</code>.</li>
+<li>Both services join a network named <code>aries-network</code>. Volumes are mentioned and then postponed to Kubernetes.</li>
+<li><code>docker-compose up</code> builds and starts both. The frontend reaches the backend by the hostname, not by localhost.</li>
+<li>He runs <code>git init</code>, adds a <code>.gitignore</code>, and pushes a public repo he describes as the Aries app, with a README titled Docker tutorial.</li>
+</ul>
+<p class="def"><strong>Compose.</strong> A YAML file that starts several containers, with a shared network and a start order.</p>
+</article>
+<article class="lecture" id="lecture-028">
+<h3>028 — Push Registry</h3>
+<ul>
+<li><code>docker login</code> and later <code>docker logout</code>.</li>
+<li>He tags the local image as <code>username/aries-backend:latest</code> and runs <code>docker push</code>. The registry stores a compressed copy. A pull on another machine gets the same image.</li>
+<li>Public Docker Hub is fine for this demo. Real apps go to a private registry: AWS ECR, Google GCR, or Azure ACR.</li>
+<li>He removes local images and containers before rebuilding so the tag he pushes is the one he just built.</li>
+</ul>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Installing Docker, joining the docker group, running Ubuntu, Alpine, Kali, and Nginx, writing Dockerfiles, building the Aries backend and frontend, starting them with Compose, and pushing the backend image to Docker Hub.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Install Docker and run a container without sudo.</li>
+<li>Pull an image, run it interactively, and map a host port with <code>-p host:container</code>.</li>
+<li>Read logs, exec into a container, and inspect its IP.</li>
+<li>Write a Dockerfile with <code>FROM</code>, <code>WORKDIR</code>, <code>COPY</code>, <code>RUN</code>, and <code>CMD</code>, and prefer a small Alpine or slim base.</li>
+<li>Build the Aries API so it binds <code>0.0.0.0</code>, and reach it from a second container by hostname.</li>
+<li>Start both services with <code>docker-compose up</code> and push a tagged image after <code>docker login</code>.</li>
+</ul>
+</div>
+</section>
+<section class="unit" id="unit-09">
+<h2>09 — AWS</h2>
+<p class="lead">Region is <code>ap-south-1</code> unless a screen says otherwise. The IAM user is “course user”. Do the labs as that user, not as root. Delete stacks, clusters, and instances when the lecture ends so they do not keep billing.</p>
+<article class="lecture" id="lecture-029">
+<h3>029 — Introduction to AWS</h3>
+<ul>
+<li>AWS is a large set of services. He says it is the biggest public cloud. The console is the website. The CLI he wants is version 2, not version 1.</li>
+<li>Install: Windows MSI, Mac <code>brew install awscli</code>, Linux the three official install commands. Check <code>aws --version</code>.</li>
+<li>He groups services: compute (EC2, Elastic Beanstalk, Lambda, ECS, ECR, EKS), storage (S3, EBS, EFS, Glacier, Snowball), databases (RDS, DynamoDB, Redshift, ElastiCache), messaging (SQS, SNS), analytics (Athena, EMR, Glue, Kinesis, MSK).</li>
+<li>He restates SaaS, then PaaS, then IaaS in the correct order. A VPC is an isolated network. Each region already has a default VPC and subnets. He skips custom CIDR and peering.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-030">
+<h3>030 — IAM S3</h3>
+<ul>
+<li>The root account is the email that owns the bill. Day-to-day work uses an IAM user. He creates “course user” with console access, a custom password, the AdministratorAccess policy, and a tag <code>course</code>.</li>
+<li>He creates an access key for the CLI. <code>aws configure</code> asks for the access key id, the secret, region <code>ap-south-1</code>, and output <code>json</code>. The files are <code>~/.aws/credentials</code> and <code>~/.aws/config</code>.</li>
+<li>Test with <code>aws s3 ls</code>.</li>
+<li>S3 is blob storage. Bucket names are global. <code>course-test-bucket</code> is taken, so he uses a name like <code>course-test-dude</code> in <code>ap-south-1</code> with tag <code>course=s3</code>.</li>
+<li>He uploads <code>apple data.csv</code> and a folder. The object URL is private. He turns off Block Public Access, warns that this is dangerous, and sets the object ACL to public-read so an incognito window can open it.</li>
+<li>Reasons he gives for S3: cheap large storage, public URLs, and access from code.</li>
+</ul>
+<p class="def"><strong>IAM.</strong> Identity and Access Management. Users, keys, and policies that decide who can call AWS.</p>
+<p class="def"><strong>S3.</strong> Simple Storage Service. Files (objects) live in buckets.</p>
+</article>
+<article class="lecture" id="lecture-031">
+<h3>031 — SDK</h3>
+<ul>
+<li><code>pip install boto3</code>. A resource client is <code>boto3.resource("s3", aws_access_key_id=..., aws_secret_access_key=..., region_name=...)</code>.</li>
+<li>He lists buckets with <code>for b in s3.buckets.all(): print(b.name)</code>.</li>
+<li>Keys belong in <code>.env</code> via <code>load_dotenv</code> and <code>os.getenv</code>. Hardcoding them, or relying only on the CLI file while also pasting keys into source, is the mistake he calls out.</li>
+<li><code>create_bucket</code> needs <code>CreateBucketConfiguration</code> with <code>LocationConstraint</code> set to <code>ap-south-1</code>. Without that, the bucket lands in <code>us-east-1</code>.</li>
+<li>He deletes the bucket from the same script, then <code>download_file</code> with the bucket name, the object key (not an <code>s3://</code> URI), and a local name such as <code>test.txt</code>. Pandas can <code>read_csv</code> a public object URL directly.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-032">
+<h3>032 — Paramstore s3-adv cloudshell</h3>
+<ul>
+<li>Parameter Store sits inside Systems Manager. He creates string parameters <code>eggs=10</code> and <code>bread</code> as a short list of colours, tagged <code>course=paramstore</code>.</li>
+<li>The client is <code>boto3.client("ssm", region_name="ap-south-1")</code>. Read with <code>get_parameter(Name="eggs")["Parameter"]["Value"]</code>. The region is required.</li>
+<li>CloudShell is a browser bash that is already logged into AWS. He makes a directory, opens vim, and runs <code>aws s3 ls</code> and <code>aws s3 ls s3://bucket/prefix</code>.</li>
+</ul>
+<p class="def"><strong>Parameter Store.</strong> A place in AWS for small config strings your code can read without baking them into the image.</p>
+</article>
+<article class="lecture" id="lecture-033">
+<h3>033 — EC2 Creation</h3>
+<ul>
+<li>EC2 is a virtual machine. He launches one named Course, count 1, Ubuntu 22.04 rather than Amazon Linux, type <code>t2.micro</code> (free tier). He says <code>t2.medium</code> is the size he would pick for roughly a hundred to a thousand users. The two numbers that matter are vCPU and memory in GiB.</li>
+<li>Key pair <code>course-altair</code>, RSA, <code>.pem</code>. PPK is only for PuTTY. On the laptop, <code>chmod 400 course-altair.pem</code>. If you lose the pem you cannot download it again and you cannot log in.</li>
+<li>Security group <code>launch-wizard-1</code> is the firewall. Inbound SSH 22 from My IP first, later from <code>0.0.0.0/0</code>. Outbound is all traffic. Disk is 10 GiB gp2. gp3 is the faster default he mentions.</li>
+<li>After launch he copies the public IPv4 or the public DNS. <code>ssh -i course-altair.pem ubuntu@IP</code>. Type <code>yes</code> for the fingerprint. <code>df -h</code> shows about 10 GB.</li>
+</ul>
+<p class="def"><strong>Security group.</strong> A firewall on the instance. If a port is not inbound, the browser hangs instead of showing a page.</p>
+<p class="def"><strong>AMI.</strong> Amazon Machine Image. The snapshot of the operating system you boot, such as Ubuntu 22.04.</p>
+</article>
+<article class="lecture" id="lecture-034">
+<h3>034 — EC2 Deployment</h3>
+<ul>
+<li>Two ways to get code onto the box. <code>scp -i key -r /local/backend ubuntu@ip:~/backend</code> must be typed on the laptop, not inside the server. The better way is <code>git clone</code>.</li>
+<li>A public HTTPS clone works. After the Aries repo is private, HTTPS asks for a password and fails. On the server he runs <code>ssh-keygen</code>, cats <code>~/.ssh/id_rsa.pub</code>, and adds it as a deploy key titled “course ec2” with write access. Then <code>git clone git@github.com:.../aries-app.git</code>.</li>
+<li><code>cd aries-app/backend</code>, <code>sudo apt update</code>, <code>sudo apt install python3-pip</code>, <code>pip install flask</code> or <code>pip install -r requirements.txt</code>.</li>
+<li><code>python3 app.py</code> on <code>127.0.0.1</code> is invisible from outside. He sets host <code>0.0.0.0</code>. The browser still spins until the security group allows inbound TCP 8000. Then <code>/</code> is hello world and <code>/api</code> returns the names.</li>
+<li>He adds <code>templates/index.html</code> saying hello from EC2, commits and pushes from the laptop, then on the server Ctrl+C, <code>git pull</code>, and runs the app again.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-035">
+<h3>035 — EC2 Networking</h3>
+<ul>
+<li>A browser asks DNS for a name such as <code>blog.example.com</code>, gets one IP, and talks to port 80 (HTTPS is 443). Several apps can share that IP if something on port 80 routes by the Host header.</li>
+<li>That something is a reverse proxy, also called an ingress. He names Nginx as the one to learn, Apache HTTP Server as the older one, Traefik as newer, and Caddy as rare. Nginx can also do rate limiting, a web application firewall, and later a load balancer.</li>
+<li><code>sudo apt install nginx</code>, <code>systemctl status nginx</code>. <code>sudo lsof -i -P -n | grep LISTEN</code> shows Nginx on 80 and Python on 8000.</li>
+<li><code>curl localhost</code> is the same as <code>curl http://localhost:80</code>. <code>systemctl stop nginx</code> and <code>systemctl start nginx</code> turn the page off and on. The security group must allow inbound 80 or the public IP spins. The default page is “Welcome to nginx”.</li>
+</ul>
+<p class="def"><strong>Reverse proxy.</strong> A server on port 80 that forwards each hostname to a different app port.</p>
+</article>
+<article class="lecture" id="lecture-036">
+<h3>036 — EC2 nginx</h3>
+<ul>
+<li>He keeps Flask alive after logout with <code>nohup python3 app.py &amp;</code>. Output goes to <code>nohup.out</code>. Find the PID with <code>lsof</code> and stop it with <code>kill -9 PID</code>. Do not kill <code>sshd</code>. Ctrl+R searches shell history. He aliases <code>clr</code> to <code>clear</code>.</li>
+<li>The site file is <code>/etc/nginx/sites-enabled/default</code>. He adds <code>/etc/nginx/sites-enabled/course</code> with <code>sudo vim</code>: <code>listen 80</code>, <code>server_name balaji.ml</code>, and <code>location / { proxy_pass http://localhost:8000; }</code>. Every line ends with a semicolon. <code>sudo systemctl reload nginx</code>.</li>
+<li>He does not own a throwaway domain in the first attempt. <code>/etc/hosts</code> is unreliable in the video. The real test is Cloudflare: delete the old record, add an A record to the instance public IP, and turn the orange proxy off so the cloud is grey.</li>
+<li>After reload, <code>balaji.ml</code> shows Flask through Nginx. Port 8000 does not need to be public.</li>
+<li>SSL is the older name. TLS is the current one. HTTPS encrypts the browser connection and defaults to 443. He opens the idea, then stops: the security group blocks 443 and there is no certificate, so forcing HTTPS onto port 80 gives an SSL protocol error.</li>
+<li>A second site is <code>nohup python3 -m http.server 9000 &amp;</code>. A second server block uses <code>server_name app.balaji.ml</code> and <code>proxy_pass http://localhost:9000</code>. Cloudflare gets an A record named <code>app</code> to the same IP, proxy off. Port 9000 stays closed to the world because traffic enters on 80.</li>
+</ul>
+<p class="def"><strong>TLS.</strong> The encryption used by HTTPS. The certificate proves the server’s name.</p>
+</article>
+<article class="lecture" id="lecture-037">
+<h3>037 — ECR</h3>
+<ul>
+<li>A registry holds repositories. A repository holds tagged images such as <code>v1</code>, <code>v2</code>, and <code>latest</code>.</li>
+<li>He creates private repos <code>aries-backend</code> and <code>aries-frontend</code>. <code>aws configure</code> if the CLI is not already set.</li>
+<li>The “View push commands” box is the lab: <code>aws ecr get-login-password | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.ap-south-1.amazonaws.com</code> once, then <code>docker build -t aries-backend .</code>, <code>docker tag</code> to the full ECR URI with <code>:latest</code>, then <code>docker push</code>.</li>
+<li>Pull with <code>docker pull URI</code> and run with <code>-p 8000:8000</code>. The container listens on 8000. The account id is in the hostname. It is not your Docker Hub username. ECR stores a smaller compressed copy than the local image.</li>
+</ul>
+<p class="def"><strong>ECR.</strong> Elastic Container Registry. AWS’s private Docker registry.</p>
+</article>
+<article class="lecture" id="lecture-038">
+<h3>038 — ECS</h3>
+<ul>
+<li>A cluster holds services. A service runs a task definition. The task definition is the template: image, port, environment, CPU, and memory.</li>
+<li>He creates a Fargate cluster (he tries the name course, then aries). Fargate is serverless: no key pair and no SSH. He keeps the default VPC and two subnets, skips Container Insights, and tags <code>course=ecs</code>.</li>
+<li>Task family backend, container name aries, image URI with <code>:latest</code>, port 8000, no environment on the backend. Fargate, Linux, 1 vCPU, 2 GB.</li>
+<li>The execution role must pull private ECR. He makes IAM role <code>course-ecs-ecr-role</code> with AmazonECSTaskExecutionRolePolicy and AmazonEC2ContainerRegistryFullAccess. A task role is only needed if the container itself calls AWS APIs.</li>
+<li>Service <code>aries-backend</code>, launch type Fargate, desired count 1, no Service Connect, no load balancer, no autoscaling. If create fails, he opens the CloudFormation stack events and looks for the rollback reason.</li>
+<li>The public IP is on the task’s network interface, not on the service. HTTP to the IP hits port 80 and spins. Use <code>:8000</code> and add inbound TCP 8000 on that security group.</li>
+<li>A second task <code>aries-full</code> runs both containers. Frontend port 3000, <code>BACKEND_URL=http://localhost:8000/api</code>, because containers in one task share a network. Open port 3000. The page shows names from <code>/api</code>.</li>
+<li>He deletes the cluster at the end. He mentions App Runner in <code>us-east-1</code> as a simpler path, an application load balancer when there are many tasks, and auto scaling that adds tasks under load and removes them when it drops.</li>
+</ul>
+<p class="def"><strong>Fargate.</strong> ECS mode where AWS runs the container and you do not manage the EC2 host.</p>
+</article>
+<article class="lecture" id="lecture-039">
+<h3>039 — EB</h3>
+<ul>
+<li>Elastic Beanstalk is PaaS. AWS creates the EC2 instance, load balancer, security group, CloudWatch alarms, listener, Nginx, and a Python 3.8 platform, then installs <code>requirements.txt</code> and can autoscale. The URL is automatic.</li>
+<li>He creates an environment named Aries, platform Python 3.8, and starts with the sample application.</li>
+<li>WSGI is how a Python web app talks to a production server. gunicorn is that server. <code>pip install gunicorn</code> and <code>gunicorn --bind 0.0.0.0:8000 app:app</code>. The first <code>app</code> is <code>app.py</code>. The second is the Flask object. Comment out <code>app.run</code>.</li>
+<li>In the EB config he sets the WSGI path from <code>application</code> to <code>app:app</code>, turns on log streaming, and deletes logs on terminate. The sample app returns 502 until the real code is uploaded.</li>
+<li>He zips <code>app.py</code>, <code>business.py</code>, <code>names.txt</code>, <code>requirements.txt</code>, and <code>templates</code>. He does not include the Dockerfile. Version label V1, then Upload and Deploy.</li>
+<li>CloudWatch log groups start with <code>aws-elasticbeanstalk</code>. Alarms watch NetworkIn and NetworkOut. He requests the last 100 log lines. The EC2 console shows the instance, security group, and load balancer that Beanstalk created. He says this costs more and gives less control. A new zip is how you redeploy. He says CodePipeline can target Beanstalk later.</li>
+</ul>
+<p class="def"><strong>WSGI.</strong> The Python standard a server such as gunicorn uses to call your Flask app.</p>
+</article>
+<article class="lecture" id="lecture-040">
+<h3>040 — Lambda</h3>
+<ul>
+<li>Lambda is serverless. You supply the function. AWS owns the OS, memory, network, and runtime.</li>
+<li>He creates a Python 3.9 function. The handler starts as <code>lambda_function.lambda_handler</code>. He renames the file and the handler, gets “Unable to import module”, and puts them back in sync. The file name, the handler setting, and a click on Deploy all have to match before Test.</li>
+<li>The signature stays <code>(event, context)</code>. Return a dict or a JSON string. The test event is <code>{}</code>. The body lists game names from the Assassin’s Creed series. He edits one name, deploys, and the public URL changes.</li>
+<li>Function URL auth type NONE makes it public. He names triggers he does not build: S3, EventBridge, Kafka, MongoDB, Shopify, Alexa. Destinations he names are SNS and SQS.</li>
+</ul>
+<p class="def"><strong>Lambda.</strong> A function AWS runs when something invokes it. You do not keep a server process running.</p>
+</article>
+<article class="lecture" id="lecture-041">
+<h3>041 — Postgres</h3>
+<ul>
+<li>Local Postgres: <code>docker run -e POSTGRES_PASSWORD=ABCD -p 5432:5432 postgres:14-alpine</code>. A browser on that port shows nothing. You need a client.</li>
+<li><code>pip install psycopg2-binary</code>. Connect with host <code>localhost</code>, port 5432, database <code>postgres</code>, user <code>postgres</code>, and the password.</li>
+<li><code>cur = conn.cursor()</code> then <code>CREATE TABLE users (id SERIAL PRIMARY KEY, name, email, password)</code> and <code>conn.commit()</code>. He prints that the table was created.</li>
+<li>He names the <code>psql</code> command line and the SQL verbs CREATE DATABASE, SELECT, INSERT, and DROP.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-042">
+<h3>042 — RDS</h3>
+<ul>
+<li>He creates Postgres 14, identifier Aries, master username Aries, password at least 8 characters, 20 GiB storage, storage autoscaling off, public access on, password auth, performance insights off. Creation takes several minutes while AWS shows “backing up”.</li>
+<li>The Python host becomes the RDS endpoint, not localhost. The port stays 5432.</li>
+<li>Public access is still not enough. The security group must allow 5432 from your IP or the client times out. He notes a private database is safer when the app lives in the same VPC.</li>
+<li>He installs TablePlus from the Linux instructions on tableplus.com and connects with the endpoint. He points at the query editor and snapshots that land in S3.</li>
+</ul>
+<p class="def"><strong>RDS.</strong> A managed SQL database. AWS patches the server. You get an endpoint and a master password.</p>
+</article>
+<article class="lecture" id="lecture-043">
+<h3>043 — CDN</h3>
+<ul>
+<li>He says other SQL engines on RDS (Oracle, MariaDB, SQL Server) are the same screens with a different engine.</li>
+<li>OpenSearch is AWS’s Elasticsearch, renamed from Amazon Elasticsearch. It is for search and logs. Create a domain, get an endpoint, and log in. He does not build one.</li>
+<li>DynamoDB is AWS’s document database, the alternative he contrasts with MongoDB. He says latency stays predictable as data grows, and that exams ask about it next to EC2, Lambda, and Beanstalk. Create, read, update, and delete still apply. He does not write the Python client.</li>
+<li>The rest of the lecture is the CDN problem: a server in London is slow for a user in Australia. HTML, CSS, JavaScript, and images do not need to come from the database region. A content delivery network keeps copies near the user. CloudFront is AWS’s CDN. The next lecture builds it.</li>
+</ul>
+<p class="def"><strong>CDN.</strong> A content delivery network. Copies of static files sit in many cities so the nearest copy answers.</p>
+</article>
+<article class="lecture" id="lecture-044">
+<h3>044 — CloudFront</h3>
+<ul>
+<li>He creates an S3 bucket, turns off the public-access block, and acknowledges the warning. He uploads <code>odin.css</code> (a yellow background and black text) after checking it with the VS Code Live Server extension against <code>odin.html</code>.</li>
+<li>The HTML stays local. The stylesheet’s URL becomes the CloudFront URL plus <code>/odin.css</code>, so the CSS is served from AWS rather than the laptop.</li>
+<li>CloudFront → Create distribution, origin the new bucket. The domain says it cannot be reached while status is Deploying. After it deploys, the root returns Access Denied until he edits the object ACL to public read. <code>/odin.css</code> then returns the file.</li>
+<li>Geographic restrictions are “allow all”, which is why he calls it global. He shows Bootstrap’s own <code>cdn.jsdelivr.net</code> link as the same idea.</li>
+<li>He then tours three services without building them. Route 53 is AWS DNS, named for port 53. You can register a domain and attach it to an AWS resource. CloudWatch is logs, metrics, and alarms. CloudTrail → Event history shows who created a bucket or a pipeline, under the user “course user”.</li>
+</ul>
+<p class="def"><strong>CloudFront.</strong> AWS’s CDN. A distribution has a domain that fetches files from an origin such as S3.</p>
+</article>
+<article class="lecture" id="lecture-045">
+<h3>045 — Additional Topics</h3>
+<ul>
+<li>ETL is extract, transform, load. His example is tweets: pull them, clean them, store the result. He maps Athena to querying data, Glue to a full ETL studio (and says it is expensive to learn on), Redshift to the warehouse you load into, and Kinesis to streams. EMR is managed Hadoop, Spark, HBase, and Presto. MSK is managed Apache Kafka.</li>
+<li>App integration: SNS sends notifications to people, SQS queues messages between programs, SES sends email from your domain without you running a mail server.</li>
+<li>EKS is managed Kubernetes. GCP’s name is GKE. He will install Kubernetes himself in the next unit.</li>
+<li>He skips managed blockchain and Sumerian (VR and 3D) as things a DevOps course does not need yet.</li>
+<li>EFS is a network file system. A disk on the motherboard is fast. A disk reached over the network (NAS or NFS) is shared and slower. EFS is that idea on AWS. He says a small lab is cheaper as a disk on EC2, and EFS makes sense at terabytes.</li>
+</ul>
+<p class="def"><strong>ETL.</strong> Extract data, transform it into the shape you want, and load it into a store.</p>
+</article>
+<article class="lecture" id="lecture-046">
+<h3>046 — CodeCommit</h3>
+<ul>
+<li>He lines up AWS tools with local ones: CodeCommit is Git, CodeBuild is the CI half, CodeDeploy is the CD half, CodePipeline is the whole pipeline. He says he would normally use GitHub and Jenkins, and that this is how AWS wants the same jobs done inside one account.</li>
+<li>Folder Freya, a small <code>index.html</code> with a yellow background, checked in Live Server on port 5500. <code>git init</code>, <code>git add</code>, <code>git commit -m "HTML added"</code>.</li>
+<li>CodeCommit → create repository <code>freya</code>. He copies the SSH URL. The public key is uploaded under IAM → Users → course user → Security credentials → SSH keys for AWS CodeCommit.</li>
+<li><code>~/.ssh/config</code> points the CodeCommit host at <code>~/.ssh/id_rsa</code> and at the SSH key id shown in IAM. Then <code>git remote add origin</code> the SSH URI and <code>git push origin master</code>. The repo shows <code>index.html</code> and the commit.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-047">
+<h3>047 — Code Pipeline</h3>
+<ul>
+<li>A pipeline is source, then build, then deploy, and it runs on every new commit. Build installs dependencies and prepares the artefact. Deploy starts it. For this HTML demo the “test” is a grep.</li>
+<li><code>buildspec.yml</code> has install, pre_build, build, and post_build phases. His file mostly echoes, then <code>grep -q</code> looks for the word he put in <code>index.html</code>. If the word is missing, the build fails. He commits and pushes the file.</li>
+<li>CodeBuild project Freya, source CodeCommit repo <code>freya</code> branch <code>master</code>, managed image Amazon Linux 2, a new service role, and the buildspec file in the repo root. He starts a build by hand. With CloudWatch logs off he cannot read the phase output, but the status becomes Succeeded.</li>
+<li>He skips CodeDeploy’s EC2, Lambda, and ECS targets as too heavy for one HTML file, and creates a public S3 bucket instead.</li>
+<li>CodePipeline named Freya: source CodeCommit <code>master</code> with change detection, build project Freya, deploy to the S3 bucket. After a green pipeline the bucket holds <code>index.html</code> and <code>buildspec.yml</code>.</li>
+<li>S3 → Properties → Static website hosting, index document <code>index.html</code>. The website URL is Access Denied until the objects are public. A later deploy replaces the objects, so he edits the bucket policy and the ACL so everyone can list and read. A new commit triggers the pipeline again and the site updates after another public-read fix.</li>
+</ul>
+<p class="def"><strong>Pipeline.</strong> An automatic chain: a git push starts a build, and a successful build starts a deploy.</p>
+</article>
+<article class="lecture" id="lecture-048">
+<h3>048 — Cloudformation 1</h3>
+<ul>
+<li>CloudFormation creates other AWS resources from a file, so you do not click the ECS cluster, task, security group, VPC, and ECR repo one by one. A stack is the group of resources that file creates.</li>
+<li>YAML is the format he wants. JSON works and is harder to read. Indentation is the structure. He installs a VS Code snippet, then trims it.</li>
+<li><code>s3.yaml</code> starts with <code>AWSTemplateFormatVersion: "2010-09-09"</code>, a description, and <code>Resources</code>. The resource type is <code>AWS::S3::Bucket</code>. Properties include a globally unique bucket name and a tag <code>course: cloudformation</code>. He reads the S3 CloudFormation docs and a short example rather than memorising every property.</li>
+<li>Console → CloudFormation → Create stack → template is ready → upload the file. He peeks at the designer, names the stack <code>basic-stack</code>, adds a stack tag, and sets failure behaviour to roll back (delete what was created) because that is safer while learning. Submit, watch Events until the stack is green, then find the new bucket in S3.</li>
+<li>AWS also stores the template itself in an S3 bucket it manages. He leaves that small file alone.</li>
+</ul>
+<p class="def"><strong>Stack.</strong> The set of AWS resources CloudFormation created from one template.</p>
+</article>
+<article class="lecture" id="lecture-049">
+<h3>049 — CloudFormation 2</h3>
+<ul>
+<li>Parameters are inputs. Each has a name, a type (<code>String</code> or <code>Number</code>), a description, and a default. In the template, <code>!Ref BucketName</code> uses the value. The console shows the defaults and lets him override them on update.</li>
+<li>He first sets a tag default to the word “cloudformation” while the type is Number, and the update is rejected. He changes the default to <code>50</code>.</li>
+<li>Outputs print values after the stack exists. He wants the bucket ARN and the website URL, using <code>!GetAtt</code> on the bucket. A wrong <code>!Ref</code> in the output produces “unresolved resource dependencies”. He fixes it and updates.</li>
+<li>Changing the bucket name creates a new bucket and deletes the old one, because the name is the physical id. Changing only the tag would have updated the same bucket. The Outputs tab shows the new URL. An empty bucket’s website URL returns a not-found page, which he expects.</li>
+<li>He updates again with a different suffix and watches the previous bucket disappear when the stack says UPDATE_COMPLETE.</li>
+</ul>
+<p class="def"><strong>Parameter.</strong> An input to a template, with a default you can override when you create or update the stack.</p>
+</article>
+<article class="lecture" id="lecture-050">
+<h3>050 — CF and EC2</h3>
+<ul>
+<li>He deletes the S3 stack first and confirms the bucket is gone.</li>
+<li><code>ec2.yaml</code> uses the EC2 snippet. He removes UserData (a boot script he does not need). Tags <code>course: cloudformation-ec2</code>. Monitoring false. Instance type <code>t2.micro</code>. Key name is the existing <code>course-altair</code> pair. ImageId is the Ubuntu 22.04 AMI copied from the AMI catalog. Security group id is <code>launch-wizard-1</code>, which allows port 22.</li>
+<li>He turns the AMI into a parameter with a default, and outputs the instance id and the public IP with <code>!GetAtt</code>. Stack name <code>ec2-stack</code>. Events show the instance, and the output IP matches the EC2 console.</li>
+<li>SSH with the pem fails until he edits the security group and allows port 22 from anywhere. Then <code>ssh -i course-altair.pem ubuntu@OUTPUT_IP</code> lands on the box. Deleting the stack closes the session.</li>
+<li>Next template adds an <code>AWS::EC2::SecurityGroup</code> named like <code>altair-sg</code>, on the default VPC id. Egress is all traffic. Ingress is TCP 22 and TCP 80. The instance’s security group property is <code>!Ref</code> that group, so CloudFormation creates the group first. He deletes the old stack, uploads the new file, and SSHes in with the new output IP.</li>
+<li>He points at two GitHub folders for bigger examples: his ECS templates, and the AWS sample templates (EC2 with a security group, and ECS on Fargate). Then he deletes the stack and checks that the instance and the security group are gone.</li>
+<li>He closes AWS with a recap of the unit and says a certification exam can wait until you have used the services at work.</li>
+</ul>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Creating an IAM user and running <code>aws configure</code>. Making a public S3 bucket and a boto3 script. Launching Ubuntu on EC2, cloning Aries with a deploy key, proxying it with Nginx and Cloudflare, pushing images to ECR, running them on ECS Fargate, deploying the same API with Beanstalk and with Lambda, starting Postgres in Docker and on RDS, putting a CSS file on CloudFront, and shipping an HTML file through CodeCommit, CodeBuild, and CodePipeline into a static S3 site. The last three lectures create and delete CloudFormation stacks for an S3 bucket and an EC2 instance with its own security group.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Configure the CLI and list buckets with <code>aws s3 ls</code>.</li>
+<li>Launch a <code>t2.micro</code> Ubuntu instance, lock down the pem with <code>chmod 400</code>, and SSH in.</li>
+<li>Open only the ports you need, and put Nginx on port 80 in front of an app.</li>
+<li>Build, tag, and push an image to ECR, then run it as a Fargate service on the container port.</li>
+<li>Deploy a Flask app on Beanstalk with <code>gunicorn</code> and WSGI path <code>app:app</code>, or as a Lambda function URL.</li>
+<li>Connect to Postgres locally and to an RDS endpoint, and remember the security group.</li>
+<li>Write a CloudFormation YAML file with parameters, resources, and outputs, update the stack, and delete it when you are done.</li>
+</ul>
+</div>
+</section>
+<section class="unit" id="unit-10">
+<h2>10 — Kubernetes</h2>
+<p class="lead">He starts on Minikube, then moves the Fenrir demo to a Google Kubernetes Engine cluster. Docker must already be installed. K8S is the short name: K, eight letters, S.</p>
+<article class="lecture" id="lecture-051">
+<h3>051 — Introduction to Kubernetes</h3>
+<ul>
+<li>Kubernetes is a container orchestration tool. It creates, updates, scales, and deletes containers for you. You need the Docker unit first.</li>
+<li>One company ends up with many microservices: a frontend, a backend, and a database, repeated per product. Compose can hold a few of them. He has seen clusters with more than a thousand.</li>
+<li>Problems he lists: nobody can remember the map, it is hard to copy into another environment, disks disappear when a container dies, and a crash needs a restart and a way to share traffic.</li>
+<li>Features he writes down: deploy, manage, scale, update, roll back, health checks, logs, exec, port forwarding, labels, security, and load balancing.</li>
+<li>Google built it for their own containers and open-sourced it. The community now contributes. The next lecture names the objects you will create.</li>
+</ul>
+<p class="def"><strong>Orchestration.</strong> Software that keeps the right number of containers running and sends traffic to them.</p>
+</article>
+<article class="lecture" id="lecture-052">
+<h3>052 — Main Components</h3>
+<ul>
+<li>A node is a machine, virtual or physical, with CPU, memory, and a little disk. An EC2 instance can be a node.</li>
+<li>A pod is the smallest thing you run. It is usually one container. Extra containers in the same pod are sidecars.</li>
+<li>A deployment is a pod template plus a replica count. You create the deployment. Kubernetes creates and replaces the pods. Restarting the deployment deletes the pods and makes new ones.</li>
+<li>A service is how you reach a deployment. It load-balances across the pods. An internal service is only for the cluster. An external one is reachable from outside.</li>
+<li>An ingress is one entry point in front of many services, the same idea as Nginx on EC2. It can also terminate TLS so each service does not.</li>
+<li>A StatefulSet is a deployment whose data must survive a restart. A function that squares a number is stateless. A database is stateful.</li>
+<li>A ConfigMap holds settings such as <code>BACKEND_URL</code>. A Secret is the same idea for private data, stored base64-encoded, such as a TLS key. A PersistentVolume asks the cluster for disk, for example 100 GB. A PersistentVolumeClaim takes part of that disk for one app.</li>
+<li>He names extras he will not drill yet: ReplicaSet, StorageClass, DaemonSet, Job, CronJob, Namespace, and Custom Resource Definition.</li>
+</ul>
+<p class="def"><strong>Pod.</strong> One running container, or a few containers that always share a network and a disk.</p>
+<p class="def"><strong>Deployment.</strong> The object that keeps N copies of a pod template running.</p>
+</article>
+<article class="lecture" id="lecture-053">
+<h3>053 — K8s Architechture</h3>
+<ul>
+<li>A cluster has at least one control-plane node (he says master) and zero or more workers. Two control-plane nodes is the safer picture he draws.</li>
+<li>A worker runs kubelet, kube-proxy, and a container runtime. The runtime in this course is Docker. Kubelet asks the node for CPU and memory when Docker starts a container. Kube-proxy assigns cluster IPs and does the in-cluster load balancing. He also mentions cluster DNS.</li>
+<li>The control plane has those same three pieces plus an API server, a scheduler, a controller manager, and etcd.</li>
+<li>kubectl talks only to the API server. The scheduler decides that something must be created. The controller manager picks a node that has room and tells that node’s kubelet. etcd stores the cluster’s desired state. He says never edit etcd yourself. You cannot usefully do it. Kubernetes owns it.</li>
+<li>On EKS or GKE the cloud builds the control plane. He says a DevOps engineer must know pods, deployments, and services first, and the control-plane pieces second.</li>
+</ul>
+<p class="def"><strong>etcd.</strong> The cluster’s database. It stores what should exist and what currently exists.</p>
+<p class="def"><strong>kubectl.</strong> The command-line client. It sends your requests to the API server.</p>
+</article>
+<article class="lecture" id="lecture-054">
+<h3>054 — MiniKube Kubectl</h3>
+<ul>
+<li>Minikube runs a Kubernetes cluster on your laptop, inside Docker. He warns that a small laptop will struggle. His machine has 32 GB of RAM. Kind is the lighter alternative. Kind does not include the dashboard or ingress by default.</li>
+<li>He installs the Minikube binary from the docs, not the deb or rpm, then checks <code>minikube</code> is on the path. Docker must already answer <code>docker version</code>.</li>
+<li><code>minikube start --nodes 2 -p altair</code> makes a two-node cluster (one control plane, one worker) named Altair. The first start downloads a few hundred megabytes.</li>
+<li>He then notices kubectl is missing, installs it from the Kubernetes docs, and checks the version with <code>kubectl version</code>.</li>
+<li>The same kubectl binary can point at more than one cluster. The context decides which one receives the next command.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-055">
+<h3>055 — Dashboard</h3>
+<ul>
+<li>The dashboard is a web UI for what is running and how much CPU and memory it uses. EKS and GKE have this in their consoles. Minikube does not, until you open it.</li>
+<li>On a cluster without Minikube’s addon, the docs say <code>kubectl apply -f</code> the recommended dashboard manifest, then <code>kubectl proxy</code>, then open the printed URL. <code>apply -f</code> means “make the cluster match this file”.</li>
+<li>On Minikube the short command is <code>minikube dashboard</code>. His named profile Altair is in a bad state, so he stops those containers, runs <code>minikube start --nodes 2</code> without a custom name, and opens the dashboard again.</li>
+<li>He checks <code>minikube status</code> and <code>kubectl get all</code>. A node in this demo is using a lot of RAM, which is why he told small laptops to skip Minikube.</li>
+<li>Namespaces are separate folders for objects. A fresh cluster has <code>default</code>, <code>kube-node-lease</code>, <code>kube-public</code>, <code>kube-system</code>, and, on Minikube, <code>kubernetes-dashboard</code>. <code>kube-system</code> holds etcd, the scheduler, the API server, and kube-proxy. He says never change those. Old leftover namespaces get <code>kubectl delete namespace NAME</code>.</li>
+<li><code>docker system prune</code> and a volumes prune free several gigabytes of old Minikube data. He restarts the cluster afterwards so the dashboard is empty in <code>default</code>.</li>
+</ul>
+<p class="def"><strong>Namespace.</strong> A folder inside one cluster. Most apps are created inside a namespace. Nodes and persistent volumes are not.</p>
+</article>
+<article class="lecture" id="lecture-056">
+<h3>056 — Basic App</h3>
+<ul>
+<li>App name Fenrir. Flask <code>app.py</code> renders <code>templates/index.html</code> (“this is Fenrir”) and prints <code>os.environ</code> with a Jinja loop. The port is <code>int(os.environ.get("PORT", 8000))</code>. Setting <code>PORT=9000</code> in the shell moves the local server. Host must be <code>0.0.0.0</code> or Docker’s port map does nothing.</li>
+<li>Dockerfile: <code>FROM python:3.7-alpine</code>, <code>WORKDIR /app</code>, copy the files, <code>pip install -r requirements.txt</code>, run <code>python app.py</code>. <code>docker build -t fenrir .</code> and <code>docker run -p 8000:8000 fenrir</code>.</li>
+<li>The cluster cannot see a local image. He tags and pushes a public Docker Hub repo named Fenrir. A private registry plus an image-pull secret is what he would use at work.</li>
+<li>Folder <code>k8s/deployment.yaml</code> from the VS Code Kubernetes snippet. You set <code>apiVersion</code>, <code>kind: Deployment</code>, metadata, and spec. You do not write <code>status</code>. That appears only after the object exists. The pod template uses the Hub image, a container port, and three replicas. Labels on the template must match the selector.</li>
+<li><code>service.yaml</code> is a Service whose selector matches those labels. Service port 5000, target port 8000.</li>
+<li><code>kubectl apply -f k8s/deployment.yaml</code> (and the service file). <code>kubectl port-forward service/fenrir 5000</code> maps your localhost:5000 to the service. The page loads, which shows the service is balancing across the three pods.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-057">
+<h3>057 — Debugging &amp; Kubectl</h3>
+<ul>
+<li>He adds an env var on the container, name <code>TREE</code>, value <code>good</code>. <code>kubectl apply -f k8s/</code> applies every file in the folder. The deployment is “configured”, the revision becomes 2, and the pods are replaced. Port-forward again and the page shows the new variable.</li>
+<li>He sets <code>PORT</code> to <code>"3000"</code>. The value must be a string in YAML. The process moves to 3000, but the Service still targets 8000, so the browser is refused. He changes <code>containerPort</code> and the service <code>targetPort</code> to 3000, applies, and port-forwards again. Localhost stays 5000. Only the inside port changed.</li>
+<li>Commands: <code>kubectl get nodes</code>, <code>kubectl get pods</code>, <code>kubectl get deploy</code>, <code>kubectl get svc</code>, <code>kubectl get ns</code>. Short names: <code>po</code>, <code>deploy</code>, <code>svc</code>, <code>ns</code>, <code>cm</code>. <code>kubectl describe svc/fenrir</code> shows the cluster IP, port 5000, and target 3000. That IP does not work on the laptop. It is only inside the cluster.</li>
+<li><code>kubectl edit deploy/fenrir</code> opens vim. He changes replicas from 3 to 5 and watches five pods. He does not touch <code>status</code>. Applying the file again puts replicas back to 3. He says edit is for emergencies. The file should stay the source of truth.</li>
+<li><code>kubectl logs POD</code> shows one pod’s output, not the deployment’s. The dashboard has View logs for the same text. <code>kubectl get all</code> includes pods, services, deployments, and replica sets.</li>
+<li><code>kubectl delete pod/NAME</code> removes one pod and the deployment makes a new one. Deleting the deployment does not heal itself. <code>kubectl apply -f</code> the YAML brings it back.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-058">
+<h3>058 — Kubernetes - Building Microservices</h3>
+<ul>
+<li>He splits Fenrir into <code>frontend/</code> and <code>backend/</code>. The frontend is the page he already has. The backend is Flask with <code>/</code> returning <code>{"message": "backend is running"}</code> and <code>/api/get</code> returning names.</li>
+<li>Mongo on the laptop: <code>docker run -p 27017:27017 --name mongodb mongo</code>. A browser on that port shows Mongo’s “you are trying to access MongoDB” text, which is how he knows it is up.</li>
+<li><code>connections.py</code> uses <code>MongoClient("localhost", 27017)</code>, database <code>fenrir</code>, collection <code>names</code>. The API does <code>find()</code>, deletes each <code>_id</code>, and returns the list. He also adds a route to insert a name.</li>
+<li>He adds Mongo Express as a fourth piece, a small UI on the database, and says the set is frontend, backend, Mongo, and Mongo Express.</li>
+<li>Each service gets a Dockerfile in the style of the Flask and Node files from the Docker unit. He does not apply them to the cluster yet.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-059">
+<h3>059 — Deploying Microservices</h3>
+<ul>
+<li>He builds and pushes both images: <code>docker build -t fenrir-backend ./backend</code>, the same for the frontend, then <code>docker tag</code> to <code>docker.io/&lt;user&gt;/...</code> and <code>docker push</code>.</li>
+<li>Backend deployment uses that image and port 8000. An env var <code>MONGO_HOST</code> is the Mongo service name, so the code stops using <code>localhost</code>. Backend Service: port 80, targetPort 8000.</li>
+<li>Frontend deployment and service follow the same shape. <code>kubectl apply -f</code> creates four workloads and four services: frontend, backend, Mongo, and Mongo Express.</li>
+<li>The frontend calls the backend service. The backend and Mongo Express call the Mongo service. He draws that as four boxes joined by service names.</li>
+<li>The first port-forward fails because a target port is still 8000 where the service is actually on 80. He fixes the YAML, applies, and <code>kubectl port-forward service/fenrir-frontend 7000</code>. Localhost:7000 shows the page, which means the chain is working.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-060">
+<h3>060 — Ingress</h3>
+<ul>
+<li>By this lecture the four services are on a GKE cluster, in a namespace he has been calling Fenrir. <code>kubectl create ns fenrir</code> is the command. <code>kubens</code> switches the current namespace. <code>kubectl describe namespace default</code> shows labels. The four built-in namespaces stay untouched.</li>
+<li>An ingress is one public entry that routes by hostname. A Service attaches to one deployment. An Ingress can point at many services.</li>
+<li><code>ingress.yaml</code> kind Ingress, name fenrir, host <code>balaji.ml</code>, path <code>/</code> with <code>pathType: Prefix</code>, backend service the frontend, port 80. He had to correct the path type to <code>Prefix</code>.</li>
+<li><code>kubectl apply -f</code> the file. On GKE the ingress object appears and, after a few minutes, gets a public IP. He then changes the frontend service from LoadBalancer back to ClusterIP so only the ingress is public.</li>
+<li>In Cloudflare he deletes old records and adds an A record for the hostname to that ingress IP. Opening the hostname reaches the frontend, which still reaches the backend and Mongo inside the cluster.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-061">
+<h3>061 — Volume Services</h3>
+<ul>
+<li>Pods are replaced often, so a database with no volume loses its data. He inserts names (Aries, Athena, and others) through Mongo Express, runs <code>kubectl rollout restart deploy/mongo</code>, and <code>/api/get</code> comes back empty.</li>
+<li>On GKE the storage classes are the persistent disks: standard, SSD, and balanced. A StorageClass is the real disk. A PersistentVolume takes a slice. A claim takes part of that slice. The pod mounts the claim.</li>
+<li>He writes a 5Gi persistent volume at a path he labels for Mongo, and a claim that asks for 4Gi. The Mongo container mounts it at <code>/data/db</code>, which is where the Mongo image stores files. The volume on the deployment points at the claim.</li>
+<li><code>kubectl apply</code> updates Mongo and creates the volume and the claim. He inserts hummus, falafel, and zaatar, restarts Mongo, and <code>/api/get</code> still returns them.</li>
+<li>Service types on the same cluster: ClusterIP is internal only (the frontend). LoadBalancer has an external IP (Mongo Express and the backend, before the ingress). A headless service sets <code>clusterIP: None</code> and is what StatefulSets use when you want DNS without one shared IP. NodePort opens a port on each node’s VM. He says you will mostly use ClusterIP and LoadBalancer. In-cluster DNS looks like <code>name.namespace.svc.cluster.local</code>.</li>
+</ul>
+<p class="def"><strong>Persistent volume claim.</strong> A request by a pod for a certain amount of cluster storage, mounted at a path inside the container.</p>
+</article>
+<article class="lecture" id="lecture-062">
+<h3>062 — Helm</h3>
+<ul>
+<li>Helm is a package manager for Kubernetes, the way pip is for Python. Install Helm 3 (he has 3.11). Helm 2 is a different tool.</li>
+<li><code>helm create fenrir-chart</code> makes <code>Chart.yaml</code>, <code>values.yaml</code>, <code>.helmignore</code>, and <code>templates/</code>. He deletes the sample templates and copies in the Fenrir YAML files. <code>NOTES.txt</code> is the text printed after install.</li>
+<li><code>kubectl create ns hz</code>, switch with <code>kubens</code>, then <code>helm install hz fenrir-chart</code>. One command creates the deployments and services. <code>NOTES.txt</code> prints “successfully installed”.</li>
+<li>Templating uses <code>{{ .Values.num }}</code> in labels and <code>{{ .Values.replicas }}</code> for the replica count. <code>values.yaml</code> holds <code>num</code> and <code>replicas</code>. <code>helm template fenrir-chart</code> prints the YAML without applying it, which is how he catches a typo and a number that should have been a string.</li>
+<li><code>helm list</code> shows the release name. <code>helm upgrade hz fenrir-chart</code> applies the new values. The revision becomes 2 and the backend scales to four pods.</li>
+<li>Artifact Hub is the public catalogue. <code>helm repo add</code> the MySQL repo, then <code>helm install</code> that chart, and a MySQL workload appears. You can also point <code>helm install</code> at a chart in a Git repo.</li>
+</ul>
+<p class="def"><strong>Helm chart.</strong> A folder of Kubernetes YAML plus <code>values.yaml</code>, installed as one named release.</p>
+</article>
+<article class="lecture" id="lecture-063">
+<h3>063 — ArgoCD</h3>
+<ul>
+<li>Argo CD is Git-based continuous delivery for Kubernetes. The Git repo is the source of truth. A push updates the cluster. He prefers giving Argo a Helm chart, though plain YAML also works.</li>
+<li>He creates a public GitHub repo, <code>git init</code> in the chart folder, commits, and pushes <code>master</code>.</li>
+<li>He applies the official Argo CD install manifests (custom resources, service accounts, config maps, services, deployments). Then he installs the <code>argocd</code> CLI and port-forwards the API server to localhost:8080.</li>
+<li>The first password is the initial-admin secret from the docs. User <code>admin</code>. The Argo workloads live in the <code>argocd</code> namespace.</li>
+<li>New application: name fenrir, project default, sync policy automatic with prune and self-heal, repo URL, branch <code>master</code>, path <code>fenrir-chart</code>. Destination cluster is the default one. The first create fails because namespace <code>freya</code> does not exist. <code>kubectl create ns freya</code>, then create again. He overrides the Helm value <code>num</code> in the form.</li>
+<li>The UI shows frontend, backend, Mongo, and the ingress. He changes frontend replicas to 5, commits, pushes, and clicks Sync. The freya namespace shows five frontend pods. With automatic sync, a later push would do that without the click.</li>
+<li>Istio, in the last few minutes, is a service mesh for hundreds of services: virtual services and gateways instead of a pile of ingress rules. Calico is the other name he pairs with it. He does not install it. He says it is optional for a first cluster.</li>
+</ul>
+<p class="def"><strong>GitOps.</strong> The Git commit is what production should look like. A controller makes the cluster match the commit.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Installing Minikube and kubectl, opening the dashboard, deploying Fenrir from YAML, changing env and ports, then building frontend, backend, Mongo, and Mongo Express. On GKE he adds an ingress and a Cloudflare record, a persistent volume for Mongo, a Helm chart, and an Argo CD app that syncs that chart from GitHub.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Start a local cluster and open the dashboard, or point kubectl at GKE.</li>
+<li>Write a Deployment and a Service and apply the folder with <code>kubectl apply -f</code>.</li>
+<li>Port-forward a service, read logs, and explain why a deleted pod comes back.</li>
+<li>Point app config at a service DNS name instead of localhost.</li>
+<li>Add an Ingress and a DNS A record so one hostname reaches the frontend.</li>
+<li>Mount a volume at Mongo’s <code>/data/db</code> so a restart keeps the documents.</li>
+<li>Package the YAML with Helm and let Argo CD apply the chart when you push.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-11">
+<h2>11 — Terraform</h2>
+<article class="lecture" id="lecture-064">
+<h3>064 — Intro to Terraform</h3>
+<ul>
+<li>Terraform is infrastructure as code, made by HashiCorp. You describe cloud resources in files and create or delete them with a command. He compares it to CloudFormation, with the difference that one configuration can talk to AWS, GCP, Azure, and Kubernetes.</li>
+<li>His example architecture is RDS MySQL, an EC2 instance, and an S3 bucket, created together and removed together with <code>terraform destroy</code>. He likens that packaging to Helm, but for infrastructure.</li>
+<li>He reuses the IAM user “course user” and checks that an access key id and a secret access key exist. He copies both into <code>notes.txt</code> inside a new folder <code>terraform tutorial</code>. Those keys must not be committed later.</li>
+<li>Install from the Terraform site. On Ubuntu he prefers snap. <code>terraform --version</code> shows 1.3.9 in the video. He sets <code>alias tf=terraform</code> for the rest of the unit.</li>
+<li>A configuration has a provider (where and with which credentials), resources (what to create), and helpers such as variables, outputs, and modules. A resource without its provider cannot be created.</li>
+</ul>
+<p class="def"><strong>Infrastructure as code.</strong> The servers, buckets, and networks are written in files, so they can be reviewed and recreated.</p>
+</article>
+<article class="lecture" id="lecture-065">
+<h3>065 — Terraform Providers</h3>
+<ul>
+<li>Every folder he works in has a <code>main.tf</code>. Any <code>.tf</code> file in the directory is read. He moves the file into a subfolder named <code>s3</code> so this lab stays separate.</li>
+<li>From the AWS provider docs he sets <code>required_providers</code> to <code>hashicorp/aws</code> version 4, then a <code>provider "aws"</code> block with region <code>ap-south-1</code>, <code>access_key</code>, and <code>secret_key</code> as strings.</li>
+<li><code>terraform init</code> downloads the provider into <code>.terraform</code> and writes a lock file. He says do not hand-edit <code>.terraform</code>, the lock file, or <code>terraform.tfstate</code>.</li>
+<li>A resource is <code>resource "aws_s3_bucket" "altair"</code>. The first string is the type and must be exact. The second is only the name inside Terraform, so two buckets can be <code>altair</code> and <code>altair2</code>. The real bucket name is an argument, and it must be globally unique.</li>
+<li><code>terraform apply</code>, then type <code>yes</code>. The plan says one bucket will be added. S3 shows the new empty bucket. <code>terraform.tfstate</code> is the memory of what Terraform created.</li>
+<li>He adds a tag and applies again. Terraform updates the bucket instead of replacing it. Destroy comes in the commands lecture.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-066">
+<h3>066 — Terraform- AWS s3 ec2 in action</h3>
+<ul>
+<li>In the same AWS configuration he adds <code>resource "aws_instance"</code>. The type is <code>aws_instance</code>, not a name he invents. Instance type <code>t2.micro</code>, AMI copied from the public Ubuntu 22.04 image in the EC2 catalog, <code>key_name</code> set to the existing <code>course-altair</code> pair, and a tag taken from a variable.</li>
+<li>The first apply fails with an authorization error. IAM → course user → Add permissions → attach AmazonEC2FullAccess. The next apply creates the instance. He reads the public IP from an <code>output</code> block that uses the instance’s <code>public_ip</code>.</li>
+<li>He says the same style of resource can create security groups and subnets. He does not expand that file.</li>
+<li>A new folder <code>k8s/main.tf</code> uses the Kubernetes provider. <code>config_path</code> is the kubeconfig file and the context is his GKE cluster. <code>terraform init</code> and a plan show one namespace. <code>terraform apply -auto-approve</code> creates namespace <code>altair</code>.</li>
+<li>He pastes a <code>kubernetes_deployment</code> from the docs, names it Loki, image nginx, three replicas, and sets <code>metadata.namespace</code> to <code>altair</code>. Apply moves it out of <code>default</code> into <code>altair</code>.</li>
+<li>A <code>kubernetes_service</code> selects that deployment. He deletes a load-balancer argument the API rejects, applies again, and waits for an external IP.</li>
+<li>A third folder uses the Helm provider with the same kubeconfig. A <code>helm_release</code> named Freya points at the Fenrir chart path. <code>terraform init</code> and <code>terraform apply -auto-approve</code> install the frontend, backend, and Mongo. He did not set a namespace, so they land in <code>default</code>.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-067">
+<h3>067 — Terraform Commands</h3>
+<ul>
+<li><code>terraform plan</code> prints what would change and changes nothing. <code>terraform plan -out=s3.plan</code> saves that plan. <code>terraform apply s3.plan</code> runs the saved plan even if you edited the <code>.tf</code> files afterwards.</li>
+<li><code>terraform validate</code> only checks syntax. A valid-looking typo can still pass. A missing required argument fails it. <code>terraform apply</code> without a plan file asks for <code>yes</code> unless you pass <code>-auto-approve</code>. <code>terraform destroy</code> deletes everything in the state.</li>
+<li>An input variable has a type and a default. He references it in the bucket tag. A file such as <code>terraform.tfvars</code> with <code>number = 300</code> overrides the default, which the next plan shows.</li>
+<li>An output, usually in <code>outputs.tf</code>, prints a value after apply. He outputs the bucket id, then switches the attribute to the hosted zone id and applies again to see the new value.</li>
+<li><code>.gitignore</code> ignores <code>.terraform/</code>, <code>*.tfstate</code>, state backups, <code>*.tfvars</code> (the secrets), and plan files. He deletes the <code>.plan</code> file, <code>git init</code>, commits, creates a public repo, and <code>git push -u origin</code>. Someone else clones it, fills in variables, and runs init and apply.</li>
+</ul>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Installing Terraform, configuring the AWS provider with the course user’s keys, creating an S3 bucket, an EC2 instance, a GKE namespace, an nginx deployment and service, and a Helm release. He plans, validates, outputs values, destroys, and pushes the <code>.tf</code> files to GitHub without the state or the keys.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Write a <code>provider</code> and a <code>resource</code> in <code>main.tf</code> and run <code>terraform init</code>.</li>
+<li>Read a plan before you type <code>yes</code>, and use <code>-out</code> when you want to apply exactly that plan.</li>
+<li>Create an S3 bucket and a <code>t2.micro</code> with a key name, and print the public IP as an output.</li>
+<li>Point the Kubernetes provider at your kubeconfig and create a namespace and a deployment.</li>
+<li>Install an existing Helm chart with a <code>helm_release</code>.</li>
+<li>Keep <code>.tfstate</code> and <code>.tfvars</code> out of Git, and run <code>terraform destroy</code> when the lab is over.</li>
+</ul>
+</div>
+</section>
+
+<section class="unit" id="unit-12">
+<h2>12 — Continuous integration — Jenkins, CircleCI, GitHub Actions</h2>
+<article class="lecture" id="lecture-068">
+<h3>068 — Introduction to CI-CD</h3>
+<ul>
+<li>Developers push to one Git repo. Users only talk to the running server. CI/CD is the automatic path between those two. CI packages the code (for example a Docker build and <code>pip install</code>). CD puts that package on the server. He uses “continuous delivery” for the second half.</li>
+<li>Without a pipeline, a person has to pull, build, and restart by hand. A pipeline does that on every push. He wants a small project’s pipeline to finish within a few minutes.</li>
+<li>He invents three types for the rest of the unit. Self-hosted means you run the CI server and pay for its CPU and disk. Jenkins is the example. VCS-embedded means the Git host includes CI. GitHub Actions is the example. GitLab and Bitbucket do the same. External means a company runs the workers for you. CircleCI is the example.</li>
+<li>Self-hosted keeps working if GitHub is down, as long as your Git remote is reachable. You have to patch the CI server yourself. The other two do not need a server, and they stop if that vendor stops.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-069">
+<h3>069 — Introduction to Jenkins</h3>
+<ul>
+<li>He installs Jenkins on a Google Compute Engine VM so the AWS unit is not repeated. Ubuntu, not Debian. He adds the Jenkins apt key and repository, then <code>sudo apt install jenkins</code>. <code>systemctl status jenkins</code> shows active.</li>
+<li>The VM has a network tag <code>jenkins</code>. A firewall rule allows TCP 8080 (the UI) and TCP 9000 (the demo app later) from <code>0.0.0.0/0</code>, targeted at that tag. <code>http://VM_IP:8080</code> opens the setup page.</li>
+<li>The one-time password is the secret printed on that page, also stored on the VM for the initial admin. He chooses Install suggested plugins, then creates the admin user. He uses a short password in the video. Use a real one on any VM you leave running.</li>
+<li>He notes AWS instances felt faster for package installs, and that Azure is the cloud he associates with data pipelines. Jenkins itself can also be run as a Docker container or inside Kubernetes. The UI is the same.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-070">
+<h3>070 — Jenkins Jobs</h3>
+<ul>
+<li>Private GitHub repo <code>edward-jenkins</code>. Local folder Edward: Flask <code>app.py</code>, templates, <code>requirements.txt</code> containing flask, and a Dockerfile from <code>python:3.9-slim-buster</code> with <code>WORKDIR /app</code>, copy, <code>pip install</code>, and <code>python app.py</code>. He commits and pushes.</li>
+<li>On the VM, HTTPS clone of a private repo fails because GitHub no longer accepts account passwords. He clones with a personal access token as the password, installs Docker from his saved apt commands, and checks <code>docker run hello-world</code>.</li>
+<li>Manual first deploy: <code>docker build -t edward .</code>, <code>docker run -d -p 9000:9000 --name edward edward</code>. The page says hello from Jenkins. <code>docker stop edward</code> then <code>docker rm edward</code> clears it. Port 9000 is why the firewall has that port.</li>
+<li>Jenkins → New Item → Freestyle project named Edward. Source code management is Git, the SSH or HTTPS URL, and credentials of type “username with password” where the password is the GitHub token. SCM is the same idea as version control.</li>
+<li>The shell build step is the four commands he will rerun forever: <code>docker stop edward</code>, <code>docker rm edward</code>, <code>docker build -t edward .</code>, <code>docker run -d -p 9000:9000 --name edward edward</code>. The workspace path must be the cloned repo, or the build context <code>.</code> is wrong.</li>
+<li>The first build fails with permission denied on the Docker socket. He adds the <code>jenkins</code> user to the <code>docker</code> group and <code>sudo systemctl restart jenkins</code>. The next build is green and port 9000 serves the page.</li>
+<li>Poll SCM is set to every minute. A local edit, commit, and push produces a new build without clicking Build Now. During the build the site drops, then comes back with the new text.</li>
+<li>Manage Jenkins → Plugins is where Maven, AWS, GCP, and Elasticsearch integrations live. He does not install them. He mentions a Jenkinsfile as the same job written in the repo, and leaves that style for GitHub Actions and CircleCI.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-071">
+<h3>071 — GH Actions</h3>
+<ul>
+<li>GitHub → Actions on the same <code>edward-jenkins</code> repo. A workflow file lives in <code>.github/workflows/</code>, for example <code>basic.yaml</code>.</li>
+<li>He starts from an SSH action (appleboy/ssh-action). The workflow name is remote SSH commands. <code>on: push</code> with <code>branches: [master]</code> so other branches do not deploy.</li>
+<li>The job runs on GitHub’s Ubuntu runner and SSHes to the GCP VM. Secrets hold the host, the username, and the password. The SSH port is 22. He turns on username-and-password login on the VM so the action can connect.</li>
+<li>The remote script is the same stop, remove, build, and run he typed in Jenkins. A push to <code>master</code> is what starts it. He then says the next lecture should split “build and push an image” from “deploy that image”, instead of building on the VM.</li>
+</ul>
+<p class="def"><strong>GitHub Action.</strong> A YAML workflow in the repo. GitHub runs it when the <code>on:</code> event happens, such as a push.</p>
+</article>
+<article class="lecture" id="lecture-072">
+<h3>072 — GH Jenkins</h3>
+<ul>
+<li>He copies GitHub’s “publish a Docker image” workflow. Trigger is push to <code>master</code>. The job checks out the repo, logs in to Docker Hub, and builds and pushes.</li>
+<li>Repository secrets: <code>DOCKER_USERNAME</code> and <code>DOCKER_PASSWORD</code>. The image is <code>docker.io/&lt;user&gt;/edward</code> with tag <code>master</code>. He creates that public Hub repository first. The Actions log shows the Flask install and a green push. Hub shows a new <code>master</code> tag. That is the CI half.</li>
+<li>The CD half is a second job, or extra steps, that SSH to the VM and run <code>docker stop</code>, <code>docker rm</code>, <code>docker pull</code>, and <code>docker run</code> of <code>docker.io/&lt;user&gt;/edward:master</code>. Two jobs in parallel can deploy before the push finishes. He puts the SSH steps after the push in one job so they run in order.</li>
+<li>The first deploy reuses the VM’s old local image. He adds <code>docker rmi</code> of that tag before <code>docker pull</code>, pushes again, and the page changes to the new text.</li>
+<li>He then turns the deploy steps off in GitHub and leaves Jenkins as the CD side: Jenkins pulls the tag GitHub Actions just pushed, instead of building from source. CI is Actions. CD is Jenkins.</li>
+</ul>
+</article>
+<article class="lecture" id="lecture-073">
+<h3>073 — CircleCI</h3>
+<ul>
+<li>CircleCI is the external CI. He signs up with GitHub, authorises the organisation, and picks the <code>edward-jenkins</code> repo. The free tier runs one job at a time.</li>
+<li>He points the GitHub workflow at a branch that does not exist so Actions stops firing. CircleCI wants <code>.circleci/config.yml</code>.</li>
+<li>The config uses the Docker orb. A job logs in, builds, and pushes. The image name is his Hub user plus <code>edward</code>, tag <code>latest</code>. Username and password are CircleCI project environment variables, not GitHub secrets. The first pipeline fails until those two variables exist. The next push publishes <code>latest</code> next to the <code>master</code> tag Actions made earlier.</li>
+<li>An orb is a packaged set of steps. A job is the work. A workflow lists the jobs to run. A job that is not in a workflow does not run.</li>
+<li>He points the Jenkins shell at tag <code>latest</code> instead of <code>master</code>. The first builds fail because <code>docker rmi</code> and <code>docker stop</code> run when nothing is there. He fixes the script to stop and remove by id, including stopped containers (<code>docker ps -aq</code>), and rebuilds until the page says hello from CircleCI and Jenkins. CircleCI did the build and push. Jenkins did the deploy.</li>
+<li>He closes with a one-minute look at GCP Cloud Build: a <code>cloudbuild.yaml</code> in the repo, triggers on the GCP console, history of builds. He says it is the same shape as CircleCI, and that AWS CodePipeline from unit 09 is the AWS version of the same idea.</li>
+</ul>
+<p class="def"><strong>Orb.</strong> A CircleCI package of ready-made steps, such as the Docker login, build, and push.</p>
+</article>
+<div class="closer">
+<h3>What he is doing in this unit</h3>
+<p>Installing Jenkins on a GCP VM, opening ports 8080 and 9000, and creating a freestyle job that rebuilds the Edward Flask image on every push. He then moves the Docker build to GitHub Actions, then to CircleCI, and leaves Jenkins pulling the new tag and restarting the container.</p>
+<h4>After this unit you should be able to</h4>
+<ul>
+<li>Explain self-hosted, Git-host, and external CI with Jenkins, GitHub Actions, and CircleCI.</li>
+<li>Install Jenkins, unlock it, and add a Git credential that uses a personal access token.</li>
+<li>Write a freestyle shell step that stops, removes, builds, and runs a named container.</li>
+<li>Put a workflow in <code>.github/workflows</code> that runs on push to <code>master</code> and reads secrets.</li>
+<li>Push an image from Actions or from <code>.circleci/config.yml</code>, using Hub credentials stored in that product.</li>
+<li>Keep build and deploy in order, and delete the old local image so <code>docker pull</code> actually fetches the new tag.</li>
+<li>Turn the lab VM off when you finish. Jenkins and the open ports cost money and expose the demo app.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</body>
+</html>
